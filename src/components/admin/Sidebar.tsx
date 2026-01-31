@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 
 const menuItems = [
     { title: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
+    { title: 'Anfragen', icon: MessageSquare, href: '/admin/inquiries' },
     { title: 'Seiten', icon: FileText, href: '/admin/pages' },
     { title: 'Kategorien', icon: Layers, href: '/admin/categories' },
     { title: 'Produkte', icon: Box, href: '/admin/products' },

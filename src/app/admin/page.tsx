@@ -18,8 +18,8 @@ export default async function AdminDashboard() {
     const db = await readDb();
 
     const stats = [
+        { title: 'Anfragen', value: db.inquiries?.length || 0, icon: MessageSquare, color: 'text-red-500', bg: 'bg-red-500/10' },
         { title: 'Seiten', value: db.pages?.length || 0, icon: FileText, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-        { title: 'Kategorien', value: db.categories?.length || 0, icon: Layers, color: 'text-purple-500', bg: 'bg-purple-500/10' },
         { title: 'Produkte', value: db.products?.length || 0, icon: Box, color: 'text-brand-teal', bg: 'bg-brand-teal/10' },
         { title: 'Testimonials', value: db.testimonials?.length || 0, icon: MessageSquare, color: 'text-orange-500', bg: 'bg-orange-500/10' },
         { title: 'Blog-Posts', value: db.blog?.length || 0, icon: BookOpen, color: 'text-pink-500', bg: 'bg-pink-500/10' },
