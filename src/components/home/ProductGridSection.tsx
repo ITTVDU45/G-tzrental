@@ -1,16 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Filter, ArrowUpDown, ArrowRight } from "lucide-react";
-import { products } from "@/data/mockProducts";
 
 export function ProductGridSection() {
     const [filterOpen, setFilterOpen] = useState(false);
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch('/api/admin/products');
+                const data = await res.json();
+                setProducts(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     // Using the mock products. In a real app, we might filter/sort these.
     const displayProducts = products;
+
+    if (loading) return null;
 
     return (
         <section className="py-24 bg-zinc-50 dark:bg-zinc-950">

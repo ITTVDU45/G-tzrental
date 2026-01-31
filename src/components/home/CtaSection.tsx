@@ -38,8 +38,8 @@ export function CtaSection() {
                     <div className="relative h-[300px] md:h-[500px] w-full rounded-[2.5rem] overflow-hidden group">
                         {/* Main Background Image */}
                         <Image
-                            src="https://images.unsplash.com/photo-1541888946425-d81bb19480c5?auto=format&fit=crop&q=80&w=1200"
-                            alt="Construction site"
+                            src="/Beustelle.png"
+                            alt="Großprojekt Baustelle"
                             fill
                             className="object-cover transition-transform duration-1000 group-hover:scale-105"
                         />
@@ -53,8 +53,8 @@ export function CtaSection() {
                                 className="relative w-40 h-40 md:w-64 md:h-64 rounded-3xl overflow-hidden shadow-2xl border-8 border-white/50 backdrop-blur-sm transform rotate-3 hover:rotate-0 transition-transform duration-500"
                             >
                                 <Image
-                                    src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=600"
-                                    alt="Machine detail"
+                                    src="/bediener.png"
+                                    alt="Fachkraft bei der Arbeit"
                                     fill
                                     className="object-cover"
                                 />

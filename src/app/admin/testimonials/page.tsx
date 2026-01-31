@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import DataTable from '@/components/admin/DataTable';
 import Image from 'next/image';
 import { Star } from 'lucide-react';
+import TestimonialModal from '@/components/admin/modals/TestimonialModal';
 
 interface Testimonial {
     id: number;
@@ -17,6 +18,8 @@ interface Testimonial {
 export default function AdminTestimonialsPage() {
     const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
 
     const fetchTestimonials = async () => {
         try {
@@ -35,6 +38,7 @@ export default function AdminTestimonialsPage() {
     }, []);
 
     const columns = [
+        // ... (columns logic remains same)
         {
             header: 'Kunde',
             accessor: (item: Testimonial) => (
@@ -76,6 +80,22 @@ export default function AdminTestimonialsPage() {
         }
     };
 
+    const handleSave = async (formData: Partial<Testimonial>) => {
+        try {
+            const res = await fetch('/api/admin/testimonials', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            if (res.ok) {
+                setIsModalOpen(false);
+                fetchTestimonials();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <div className="p-10 space-y-10">
             <div>
@@ -87,10 +107,23 @@ export default function AdminTestimonialsPage() {
                 title="Kundenstimmen"
                 data={testimonials}
                 columns={columns}
-                onEdit={(item) => alert(`Bearbeiten: ${item.name}`)}
+                onEdit={(item) => {
+                    setSelectedTestimonial(item);
+                    setIsModalOpen(true);
+                }}
                 onDelete={handleDelete}
-                onAdd={() => alert('Neues Testimonial hinzufügen')}
+                onAdd={() => {
+                    setSelectedTestimonial(null);
+                    setIsModalOpen(true);
+                }}
                 loading={loading}
+            />
+
+            <TestimonialModal
+                isOpen={isModalOpen}
+                onCloseAction={() => setIsModalOpen(false)}
+                onSaveAction={handleSave}
+                testimonial={selectedTestimonial}
             />
         </div>
     );

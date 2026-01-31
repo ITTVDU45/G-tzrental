@@ -7,28 +7,28 @@ import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
 const slides = [
     {
-        id: 1,
-        title: "Für jedes Projekt die beste Mietlösung",
-        description: "Über 22.000 Lösungen für alle Höhen. Arbeitsbühnen, Stapler und mehr.",
-        image: "https://images.unsplash.com/photo-1581094794329-cd132ad97c55?auto=format&fit=crop&q=80&w=2600",
-        cta: "Jetzt mieten",
-        color: "bg-brand-teal",
+        id: 0,
+        title: "Industrielle Lösungen für höchste Präzision",
+        description: "Unsere Spezialgeräte für Lager und Industrie – kompakt, wendig und leistungsstark.",
+        image: "/GrünerSpiderListinIndustrielager.png",
+        cta: "Spezialgeräte entdecken",
+        color: "bg-brand-green",
     },
     {
-        id: 2,
-        title: "Maximale Leistung, minmale Ausfallzeit",
-        description: "Unsere Premium-Flotte steht bereit. Top gewartet und sofort verfügbar.",
-        image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&q=80&w=2600",
-        cta: "Sortiment ansehen",
+        id: 1,
+        title: "Effiziente Logistik mit modernster Technik",
+        description: "Leistungsstarke Stapler für Ihren Warenumschlag. Zuverlässig und einsatzbereit.",
+        image: "/StablerinIndustriehalle.png",
+        cta: "Stapler ansehen",
         color: "bg-brand-dark",
     },
     {
-        id: 3,
-        title: "Kompetenz die Sie weiterbringt",
-        description: "Expertenberatung für komplexe Baustellenlogistik und Speziallösungen.",
-        image: "https://images.unsplash.com/photo-1531973576160-7125cdcd63e7?auto=format&fit=crop&q=80&w=2600",
-        cta: "Kontakt aufnehmen",
-        color: "bg-brand-green",
+        id: 2,
+        title: "Ihre Experten für Arbeitsbühnen & Scherenbühnen",
+        description: "Qualität und Sicherheit für Ihre Projekte in luftiger Höhe. Entdecken Sie unsere moderne Flotte.",
+        image: "/Teleskopbühne&Scherenbühne.png",
+        cta: "Jetzt anfragen",
+        color: "bg-brand-teal",
     },
 ];
 
@@ -39,6 +39,13 @@ interface HeroCarouselProps {
 export function HeroCarousel({ onExploreClick }: HeroCarouselProps) {
     const [current, setCurrent] = useState(0);
 
+    // Safety check: reset current index if it exceeds the length of slides (useful for HMR)
+    useEffect(() => {
+        if (current >= slides.length) {
+            setCurrent(0);
+        }
+    }, [current]);
+
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrent((prev) => (prev + 1) % slides.length);
@@ -48,6 +55,9 @@ export function HeroCarousel({ onExploreClick }: HeroCarouselProps) {
 
     const nextSlide = () => setCurrent((prev) => (prev + 1) % slides.length);
     const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+
+    // Fallback to avoid runtime crash if state is temporarily invalid
+    const activeSlide = slides[current] || slides[0];
 
     return (
         <section className="py-6 md:py-8 bg-zinc-50 dark:bg-zinc-900/30">
@@ -65,8 +75,8 @@ export function HeroCarousel({ onExploreClick }: HeroCarouselProps) {
                             {/* Background Image with Overlay */}
                             <div className="absolute inset-0 bg-black/40 z-10" />
                             <Image
-                                src={slides[current].image}
-                                alt={slides[current].title}
+                                src={activeSlide.image}
+                                alt={activeSlide.title}
                                 fill
                                 className="object-cover"
                                 priority
@@ -83,18 +93,18 @@ export function HeroCarousel({ onExploreClick }: HeroCarouselProps) {
                                         className="max-w-3xl space-y-6"
                                     >
                                         <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight drop-shadow-md">
-                                            {slides[current].title}
+                                            {activeSlide.title}
                                         </h1>
                                         <p className="text-lg md:text-xl text-white/90 max-w-xl leading-relaxed drop-shadow-sm">
-                                            {slides[current].description}
+                                            {activeSlide.description}
                                         </p>
 
                                         <div className="flex flex-wrap gap-4 pt-4">
                                             <button
                                                 onClick={onExploreClick}
-                                                className={`flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-white shadow-xl transition-transform hover:scale-105 ${slides[current].color}`}
+                                                className={`flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-white shadow-xl transition-transform hover:scale-105 ${activeSlide.color}`}
                                             >
-                                                {slides[current].cta}
+                                                {activeSlide.cta}
                                                 <ArrowRight className="w-5 h-5" />
                                             </button>
                                             <button

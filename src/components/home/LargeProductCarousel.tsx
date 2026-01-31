@@ -12,7 +12,7 @@ const highlightProducts = [
         title: "Alle Geräte",
         count: "22.000+",
         subtitle: "Unser Mietpark",
-        image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=800",
+        image: "/Alle geräte.png",
         isSpecial: true,
     },
     {
@@ -20,35 +20,42 @@ const highlightProducts = [
         title: "Scherenbühnen",
         subtitle: "Vertikal",
         price: "ab 120 €",
-        image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&q=80&w=800",
+        image: "/Scherenbühne.png",
     },
     {
         id: "telescope",
         title: "Teleskopbühnen",
         subtitle: "Reichweite",
         price: "ab 180 €",
-        image: "https://images.unsplash.com/photo-1558227691-41ea78d1f631?auto=format&fit=crop&q=80&w=800",
+        image: "/Teleskopbühne.png",
     },
     {
         id: "articulated",
-        title: "Gelenkbühnen",
+        title: "Gelenkteleskope",
         subtitle: "Flexibel",
         price: "ab 150 €",
-        image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80&w=800",
+        image: "/Gelenkteleskop.png",
     },
     {
-        id: "truck",
-        title: "LKW-Bühnen",
-        subtitle: "Mobil",
-        price: "ab 250 €",
-        image: "https://images.unsplash.com/photo-1625907481189-d6600c50c544?auto=format&fit=crop&q=80&w=800",
+        id: "mast",
+        title: "Mastbühnen",
+        subtitle: "Kompakt",
+        price: "ab 95 €",
+        image: "/Mastbühne.png",
     },
     {
         id: "forklift",
-        title: "Stapler",
+        title: "Gabelstapler",
         subtitle: "Lasten",
         price: "ab 95 €",
-        image: "https://images.unsplash.com/photo-1589717013858-29b14db8355b?auto=format&fit=crop&q=80&w=800",
+        image: "/Gabelstabler.png",
+    },
+    {
+        id: "roto",
+        title: "Roto-Stapler",
+        subtitle: "Multifunktional",
+        price: "ab 350 €",
+        image: "/Rotostabler.png",
     },
 ];
 
@@ -114,7 +121,7 @@ export function LargeProductCarousel() {
                                         src={item.image}
                                         alt={item.title}
                                         fill
-                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                        className="object-contain p-6 bg-white transition-transform duration-700 group-hover:scale-110"
                                         sizes="(max-width: 768px) 100vw, 33vw"
                                     />
 
@@ -127,7 +134,7 @@ export function LargeProductCarousel() {
                                     {/* Top Badges (Price or Special) */}
                                     <div className="flex justify-between items-start">
                                         {!item.isSpecial && item.price && (
-                                            <div className="bg-white/20 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-white text-sm font-semibold">
+                                            <div className="bg-brand-teal px-4 py-1.5 rounded-full text-white text-sm font-bold shadow-lg shadow-brand-teal/20">
                                                 {item.price}
                                             </div>
                                         )}

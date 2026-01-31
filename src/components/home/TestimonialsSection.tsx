@@ -1,47 +1,27 @@
-"use client";
-
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-const testimonials = [
-    {
-        id: 1,
-        name: "Thomas Weber",
-        role: "Bauleiter, Hochbau GmbH",
-        image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800",
-        text: "Die Anlieferung der Arbeitsbühnen war pünktlich auf die Minute. Die Geräte waren in top Zustand und die Einweisung durch das Personal war vorbildlich. Für uns die erste Wahl in der Region.",
-        rating: "5.0 Stars",
-    },
-    {
-        id: 2,
-        name: "Sarah Müller",
-        role: "Architektin",
-        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800",
-        text: "Wir brauchten kurzfristig eine Spezialbühne für Fassadenarbeiten. GoetzRental hat uns innerhalb von 2 Stunden geholfen. Dieser Service ist heutzutage nicht selbstverständlich.",
-        rating: "5.0 Stars",
-    },
-    {
-        id: 3,
-        name: "Michael Klein",
-        role: "Landschaftsbauer",
-        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=800",
-        text: "Faire Preise und transparente Abrechnung. Besonders die unkomplizierte Rückgabe gefällt uns sehr gut. Wir mieten hier unsere Bagger und Radlader regelmäßig.",
-        rating: "5.0 Stars",
-    },
-    {
-        id: 4,
-        name: "Andreas Meyer",
-        role: "Projektleiter",
-        image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800",
-        text: "Hervorragende Beratung bei der Auswahl der richtigen Hebebühne. Das Team ist kompetent und sehr freundlich. Absolute Empfehlung für jeden Bauherren.",
-        rating: "5.0 Stars",
-    },
-];
-
 export function TestimonialsSection() {
     const scrollRef = useRef<HTMLDivElement>(null);
+    const [testimonials, setTestimonials] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTestimonials = async () => {
+            try {
+                const res = await fetch('/api/admin/testimonials');
+                const data = await res.json();
+                setTestimonials(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTestimonials();
+    }, []);
 
     const scroll = (direction: "left" | "right") => {
         if (scrollRef.current) {
@@ -52,6 +32,8 @@ export function TestimonialsSection() {
             });
         }
     };
+
+    if (loading || testimonials.length === 0) return null;
 
     return (
         <section className="py-24 bg-[#f8f9fb] overflow-hidden">

@@ -22,11 +22,9 @@
   --foreground: #002D2D;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #002D2D;
-    --foreground: #ffffff;
-  }
+.dark {
+  --background: #002D2D;
+  --foreground: #ffffff;
 }
 
 body {

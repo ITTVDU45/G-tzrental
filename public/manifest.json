@@ -4,7 +4,7 @@
     "description": "Premium Equipment Management Portal",
     "start_url": "/admin",
     "display": "standalone",
-    "background_color": "#09090b",
+    "background_color": "#ffffff",
     "theme_color": "#008080",
     "icons": [
         {

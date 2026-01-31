@@ -28,14 +28,14 @@ import {
     Gem,
     ChevronLeft
 } from "lucide-react";
-import { type Product } from "@/data/mockProducts";
 import { cn } from "@/lib/utils";
 
 interface ProductTemplateProps {
-    product: Product;
+    product: any;
+    alternatives: any[];
 }
 
-export default function ProductTemplate({ product }: ProductTemplateProps) {
+export default function ProductTemplate({ product, alternatives }: ProductTemplateProps) {
     const [activeAccordion, setActiveAccordion] = useState<string | null>("description");
 
     return (
@@ -207,7 +207,7 @@ export default function ProductTemplate({ product }: ProductTemplateProps) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-6">
-                        {product.fullSpecs && Object.entries(product.fullSpecs).map(([key, value]) => (
+                        {product.fullSpecs && Object.entries(product.fullSpecs).map(([key, value]: [string, any]) => (
                             <div key={key} className="flex justify-between py-4 border-b border-zinc-50 dark:border-zinc-900 group">
                                 <span className="text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors">{key}</span>
                                 <span className="font-bold text-zinc-900 dark:text-white group-hover:text-brand-teal transition-colors">{value}</span>
@@ -327,7 +327,7 @@ export default function ProductTemplate({ product }: ProductTemplateProps) {
                         className="flex gap-8 overflow-x-auto pb-8 scrollbar-hide snap-x"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
-                        <MockAlternatives currentId={product.id} category={product.category} />
+                        <AlternativesList alternatives={alternatives} />
                     </div>
                 </div>
 
@@ -438,13 +438,10 @@ function StepItem({ number, title, description, icon }: { number: string, title:
     );
 }
 
-function MockAlternatives({ currentId, category }: { currentId: string, category: string }) {
-    const { products } = require("@/data/mockProducts");
-    const alts = products.filter((p: any) => p.category === category && p.id !== currentId).slice(0, 6);
-
+function AlternativesList({ alternatives }: { alternatives: any[] }) {
     return (
         <>
-            {alts.map((product: any) => (
+            {alternatives.map((product: any) => (
                 <div
                     key={product.id}
                     className="flex-shrink-0 w-[350px] snap-start group relative bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] dark:from-zinc-800 dark:to-zinc-900 rounded-[2.5rem] overflow-hidden hover:shadow-2xl transition-all duration-500 border border-zinc-100 dark:border-zinc-800 flex flex-col"
@@ -479,13 +476,13 @@ function MockAlternatives({ currentId, category }: { currentId: string, category
 
                         {/* Specs Grid */}
                         <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-6">
-                            {product.details.height && (
+                            {product.details?.height && (
                                 <div className="flex flex-col">
                                     <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Arbeitshöhe</span>
                                     <span className="text-xs font-bold text-zinc-900 dark:text-zinc-200">{product.details.height}</span>
                                 </div>
                             )}
-                            {product.details.load && (
+                            {product.details?.load && (
                                 <div className="flex flex-col">
                                     <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Tragkraft</span>
                                     <span className="text-xs font-bold text-zinc-900 dark:text-zinc-200">{product.details.load}</span>

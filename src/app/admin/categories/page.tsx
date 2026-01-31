@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import DataTable from '@/components/admin/DataTable';
 import Image from 'next/image';
 
+import CategoryModal from '@/components/admin/modals/CategoryModal';
+
 interface Category {
     id: string;
     name: string;
@@ -15,8 +17,11 @@ interface Category {
 export default function AdminCategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
     const fetchCategories = async () => {
+        setLoading(true);
         try {
             const res = await fetch('/api/admin/categories');
             const data = await res.json();
@@ -31,6 +36,21 @@ export default function AdminCategoriesPage() {
     useEffect(() => {
         fetchCategories();
     }, []);
+
+    const handleSave = async (formData: Partial<Category>) => {
+        try {
+            const res = await fetch('/api/admin/categories', {
+                method: 'POST',
+                body: JSON.stringify(formData),
+            });
+            if (res.ok) {
+                setIsModalOpen(false);
+                fetchCategories();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const columns = [
         {
@@ -74,10 +94,23 @@ export default function AdminCategoriesPage() {
                 title="Kategorie Übersicht"
                 data={categories}
                 columns={columns}
-                onEdit={(item) => alert(`Bearbeiten: ${item.name}`)}
+                onEdit={(item) => {
+                    setSelectedCategory(item);
+                    setIsModalOpen(true);
+                }}
                 onDelete={handleDelete}
-                onAdd={() => alert('Neue Kategorie hinzufügen')}
+                onAdd={() => {
+                    setSelectedCategory(null);
+                    setIsModalOpen(true);
+                }}
                 loading={loading}
+            />
+
+            <CategoryModal
+                isOpen={isModalOpen}
+                onCloseAction={() => setIsModalOpen(false)}
+                onSaveAction={handleSave}
+                category={selectedCategory}
             />
         </div>
     );

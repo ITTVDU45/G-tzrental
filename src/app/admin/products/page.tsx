@@ -13,15 +13,45 @@ interface Product {
     price: number;
 }
 
+import ProductModal from '@/components/admin/modals/ProductModal';
+
+interface Product {
+    id: string;
+    name: string;
+    category: string;
+    subcategory: string;
+    image: string;
+    description: string;
+    price: number;
+    details: {
+        height?: string;
+        reach?: string;
+        load?: string;
+        power?: string;
+        weight?: string;
+    };
+}
+
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-    const fetchProducts = async () => {
+    const fetchData = async () => {
+        setLoading(true);
         try {
-            const res = await fetch('/api/admin/products');
-            const data = await res.json();
-            setProducts(data);
+            const [prodRes, catRes] = await Promise.all([
+                fetch('/api/admin/products'),
+                fetch('/api/admin/categories')
+            ]);
+            const [prodData, catData] = await Promise.all([
+                prodRes.json(),
+                catRes.json()
+            ]);
+            setProducts(prodData);
+            setCategories(catData);
         } catch (err) {
             console.error(err);
         } finally {
@@ -30,8 +60,23 @@ export default function AdminProductsPage() {
     };
 
     useEffect(() => {
-        fetchProducts();
+        fetchData();
     }, []);
+
+    const handleSave = async (formData: Partial<Product>) => {
+        try {
+            const res = await fetch('/api/admin/products', {
+                method: 'POST',
+                body: JSON.stringify(formData),
+            });
+            if (res.ok) {
+                setIsModalOpen(false);
+                fetchData();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const columns = [
         {
@@ -61,7 +106,7 @@ export default function AdminProductsPage() {
                 method: 'DELETE',
                 body: JSON.stringify({ id: item.id }),
             });
-            fetchProducts();
+            fetchData();
         }
     };
 
@@ -76,10 +121,24 @@ export default function AdminProductsPage() {
                 title="Mietpark Liste"
                 data={products}
                 columns={columns}
-                onEdit={(item) => alert(`Bearbeiten: ${item.name}`)}
+                onEdit={(item) => {
+                    setSelectedProduct(item);
+                    setIsModalOpen(true);
+                }}
                 onDelete={handleDelete}
-                onAdd={() => alert('Neues Produkt hinzufügen')}
+                onAdd={() => {
+                    setSelectedProduct(null);
+                    setIsModalOpen(true);
+                }}
                 loading={loading}
+            />
+
+            <ProductModal
+                isOpen={isModalOpen}
+                onCloseAction={() => setIsModalOpen(false)}
+                onSaveAction={handleSave}
+                product={selectedProduct}
+                categories={categories.map(c => c.name)}
             />
         </div>
     );

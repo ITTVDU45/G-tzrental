@@ -1,6 +1,5 @@
-import { use } from "react";
 import { notFound } from "next/navigation";
-import { products } from "@/data/mockProducts";
+import { getProductById, getProducts } from "@/lib/data";
 import ProductTemplate from "@/components/products/ProductTemplate";
 
 interface ProductPageProps {
@@ -9,20 +8,27 @@ interface ProductPageProps {
     }>;
 }
 
-export default function ProductDetailPage({ params }: ProductPageProps) {
-    const { id } = use(params);
-    const product = products.find((p) => p.id === id);
+export default async function ProductDetailPage({ params }: ProductPageProps) {
+    const { id } = await params;
+    const [product, allProducts] = await Promise.all([
+        getProductById(id),
+        getProducts()
+    ]);
 
     if (!product) {
         notFound();
     }
 
-    return <ProductTemplate product={product} />;
+    const alternatives = allProducts
+        .filter((p: any) => p.category === product.category && p.id !== id)
+        .slice(0, 6);
+
+    return <ProductTemplate product={product} alternatives={alternatives} />;
 }
 
-// Optional: Pre-generate some paths if needed, though with a template it's often dynamic
-export function generateStaticParams() {
-    return products.map((product) => ({
+export async function generateStaticParams() {
+    const products = await getProducts();
+    return products.map((product: any) => ({
         id: product.id,
     }));
 }

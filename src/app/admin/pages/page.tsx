@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import DataTable from '@/components/admin/DataTable';
 import { ExternalLink } from 'lucide-react';
+import PageModal from '@/components/admin/modals/PageModal';
 
 interface Page {
     id: string;
@@ -15,6 +16,8 @@ interface Page {
 export default function AdminPagesPage() {
     const [pages, setPages] = useState<Page[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedPage, setSelectedPage] = useState<Page | null>(null);
 
     const fetchPages = async () => {
         try {
@@ -55,7 +58,7 @@ export default function AdminPagesPage() {
         {
             header: 'Link',
             accessor: (item: Page) => (
-                <a href={item.slug} target="_blank" className="text-zinc-400 hover:text-brand-teal transition-colors">
+                <a href={item.slug} target="_blank" className="text-zinc-400 hover:text-brand-teal transition-colors" rel="noreferrer">
                     <ExternalLink className="w-4 h-4" />
                 </a>
             )
@@ -72,6 +75,22 @@ export default function AdminPagesPage() {
         }
     };
 
+    const handleSave = async (formData: Partial<Page>) => {
+        try {
+            const res = await fetch('/api/admin/pages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            if (res.ok) {
+                setIsModalOpen(false);
+                fetchPages();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <div className="p-10 space-y-10">
             <div>
@@ -83,10 +102,23 @@ export default function AdminPagesPage() {
                 title="Inhaltsstruktur"
                 data={pages}
                 columns={columns}
-                onEdit={(item) => alert(`Bearbeiten: ${item.title}`)}
+                onEdit={(item) => {
+                    setSelectedPage(item);
+                    setIsModalOpen(true);
+                }}
                 onDelete={handleDelete}
-                onAdd={() => alert('Neue Seite erstellen')}
+                onAdd={() => {
+                    setSelectedPage(null);
+                    setIsModalOpen(true);
+                }}
                 loading={loading}
+            />
+
+            <PageModal
+                isOpen={isModalOpen}
+                onCloseAction={() => setIsModalOpen(false)}
+                onSaveAction={handleSave}
+                page={selectedPage}
             />
         </div>
     );

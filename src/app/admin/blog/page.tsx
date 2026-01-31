@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import DataTable from '@/components/admin/DataTable';
 import Image from 'next/image';
+import BlogModal from '@/components/admin/modals/BlogModal';
 
 interface BlogPost {
     id: string;
@@ -11,12 +12,15 @@ interface BlogPost {
     image: string;
     category: string;
     date: string;
+    readTime: string;
     status: string;
 }
 
 export default function AdminBlogPage() {
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
     const fetchPosts = async () => {
         try {
@@ -74,6 +78,22 @@ export default function AdminBlogPage() {
         }
     };
 
+    const handleSave = async (formData: Partial<BlogPost>) => {
+        try {
+            const res = await fetch('/api/admin/blog', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            if (res.ok) {
+                setIsModalOpen(false);
+                fetchPosts();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
         <div className="p-10 space-y-10">
             <div>
@@ -85,10 +105,23 @@ export default function AdminBlogPage() {
                 title="Alle Beiträge"
                 data={posts}
                 columns={columns}
-                onEdit={(item) => alert(`Bearbeiten: ${item.title}`)}
+                onEdit={(item) => {
+                    setSelectedPost(item);
+                    setIsModalOpen(true);
+                }}
                 onDelete={handleDelete}
-                onAdd={() => alert('Neuen Beitrag erstellen')}
+                onAdd={() => {
+                    setSelectedPost(null);
+                    setIsModalOpen(true);
+                }}
                 loading={loading}
+            />
+
+            <BlogModal
+                isOpen={isModalOpen}
+                onCloseAction={() => setIsModalOpen(false)}
+                onSaveAction={handleSave}
+                post={selectedPost}
             />
         </div>
     );

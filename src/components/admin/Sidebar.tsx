@@ -13,13 +13,15 @@ import {
     LogOut,
     ChevronRight,
     Menu,
-    X
+    X,
+    Image as ImageIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const menuItems = [
     { title: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
+    { title: 'Mediathek', icon: ImageIcon, href: '/admin/media' },
     { title: 'Anfragen', icon: MessageSquare, href: '/admin/inquiries' },
     { title: 'Seiten', icon: FileText, href: '/admin/pages' },
     { title: 'Kategorien', icon: Layers, href: '/admin/categories' },

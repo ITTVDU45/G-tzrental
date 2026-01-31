@@ -273,22 +273,20 @@ export function Header() {
                     <div className="px-6 md:px-8 py-4">
                         <div className="flex items-center justify-between">
                             {/* Logo */}
-                            <Link href="/" className="flex items-center gap-3 z-50 group">
+                            <Link href="/" className="z-50 shrink-0">
                                 <motion.div
-                                    className="h-12 w-12 bg-gradient-to-br from-brand-teal to-brand-lime rounded-2xl flex items-center justify-center shadow-lg shadow-brand-teal/20 group-hover:shadow-brand-teal/40 transition-all duration-300"
-                                    whileHover={{ scale: 1.05, rotate: 5 }}
-                                    whileTap={{ scale: 0.95 }}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="relative h-14 w-56 md:h-18 md:w-72"
                                 >
-                                    <span className="text-white font-bold text-2xl">G</span>
+                                    <Image
+                                        src="/GötzRental2.png"
+                                        alt="GötzRental Logo"
+                                        fill
+                                        className="object-contain"
+                                        priority
+                                    />
                                 </motion.div>
-                                <div className="flex flex-col">
-                                    <span className="text-xl font-bold tracking-tight text-brand-dark dark:text-white">
-                                        Götz<span className="text-brand-teal">Rental</span>
-                                    </span>
-                                    <span className="text-[10px] text-zinc-400 font-medium tracking-wide">
-                                        PREMIUM EQUIPMENT
-                                    </span>
-                                </div>
                             </Link>
 
                             {/* Desktop Navigation */}

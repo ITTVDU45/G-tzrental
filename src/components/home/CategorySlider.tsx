@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -18,6 +18,23 @@ const categories = [
 
 export function CategorySlider() {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch('/api/admin/categories');
+                const data = await res.json();
+                setCategories(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const scroll = (direction: "left" | "right") => {
         if (scrollContainerRef.current) {
@@ -35,6 +52,7 @@ export function CategorySlider() {
     };
 
     useEffect(() => {
+        if (categories.length === 0) return;
         const interval = setInterval(() => {
             if (scrollContainerRef.current) {
                 const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
@@ -48,7 +66,9 @@ export function CategorySlider() {
         }, 5000); // Scroll every 5 seconds
 
         return () => clearInterval(interval);
-    }, []);
+    }, [categories]);
+
+    if (loading) return null; // Or a skeleton
 
     return (
         <section className="py-16 bg-zinc-50 dark:bg-zinc-900/50">
@@ -92,20 +112,20 @@ export function CategorySlider() {
                             transition={{ delay: index * 0.1 }}
                             className="min-w-[200px] md:min-w-[240px] snap-center group"
                         >
-                            <Link href={`/mieten/${cat.name.toLowerCase()}`} className="block h-full cursor-pointer">
+                            <Link href={cat.link || `/mieten/${cat.name.toLowerCase()}`} className="block h-full cursor-pointer">
                                 <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
                                     <Image
                                         src={cat.image}
                                         alt={cat.name}
                                         fill
-                                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                        className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                 </div>
                                 <div className="pt-4 text-center">
                                     <h3 className="font-semibold text-lg text-foreground group-hover:text-brand-teal transition-colors">{cat.name}</h3>
-                                    <p className="text-sm text-foreground/60">{cat.count}</p>
+                                    <p className="text-sm text-foreground/60">{cat.count} Modelle</p>
                                 </div>
                             </Link>
                         </motion.div>

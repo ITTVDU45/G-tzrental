@@ -72,8 +72,8 @@ export function FeatureSection({ onCtaClick }: FeatureSectionProps) {
                         {/* Main Image */}
                         <div className="relative aspect-square md:aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
                             <Image
-                                src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=1000"
-                                alt="Construction site professional using machinery"
+                                src="/Baustelle2.png"
+                                alt="Professioneller Einsatz modernster Mietmaschinen auf der Baustelle"
                                 fill
                                 className="object-cover"
                                 sizes="(max-width: 1024px) 100vw, 50vw"

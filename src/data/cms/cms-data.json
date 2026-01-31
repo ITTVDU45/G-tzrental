@@ -39,31 +39,52 @@
     "categories": [
         {
             "id": "cat-1",
-            "name": "Arbeitsbühnen",
-            "image": "https://images.unsplash.com/photo-1581094794329-cd132ad97c55?auto=format&fit=crop&q=80&w=600",
-            "link": "/mieten/arbeitsbuehnen",
+            "name": "Teleskopbühnen",
+            "image": "/Teleskopbühne.png",
+            "link": "/mieten/teleskopbuehnen",
             "count": 12
         },
         {
             "id": "cat-2",
-            "name": "Stapler",
-            "image": "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?auto=format&fit=crop&q=80&w=600",
-            "link": "/mieten/stapler",
+            "name": "Scherenbühnen",
+            "image": "/Scherenbühne.png",
+            "link": "/mieten/scherenbuehnen",
             "count": 8
         },
         {
             "id": "cat-3",
-            "name": "Baumaschinen",
-            "image": "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&q=80&w=600",
-            "link": "/mieten/baumaschinen",
+            "name": "Gelenkteleskope",
+            "image": "/Gelenkteleskop.png",
+            "link": "/mieten/gelenkteleskope",
+            "count": 15
+        },
+        {
+            "id": "cat-4",
+            "name": "Mastbühnen",
+            "image": "/Mastbühne.png",
+            "link": "/mieten/mastbuehnen",
             "count": 5
+        },
+        {
+            "id": "cat-5",
+            "name": "Gabelstapler",
+            "image": "/Gabelstabler.png",
+            "link": "/mieten/gabelstapler",
+            "count": 20
+        },
+        {
+            "id": "cat-6",
+            "name": "Roto-Stapler",
+            "image": "/Rotostabler.png",
+            "link": "/mieten/roto-stapler",
+            "count": 7
         }
     ],
     "products": [
         {
             "id": "mb-80-e",
             "name": "MB 80-E",
-            "category": "Arbeitsbühnen",
+            "category": "Mastbühnen",
             "subcategory": "Vertikalmastbühne Elektrisch",
             "image": "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=800",
             "description": "Wenn neben kleiner Höhe auch seitliche Reichweite gefragt ist, spielt die MB 80-E Vertikalmastbühne ihre Stärke aus. Mit einer Arbeitshöhe von 8,20 Metern und einem integrierten Ausleger eignet sie sich ideal für präzise Arbeiten an Decken, Wänden oder über Hindernisse hinweg.",
@@ -117,7 +138,7 @@
         {
             "id": "tb-160",
             "name": "Teleskopbühne T 160",
-            "category": "Arbeitsbühnen",
+            "category": "Teleskopbühnen",
             "subcategory": "Teleskop",
             "image": "https://images.unsplash.com/photo-1558227691-41ea78d1f631?auto=format&fit=crop&q=80&w=600",
             "details": {
@@ -131,7 +152,7 @@
         {
             "id": "s-120-el",
             "name": "Scherenbühne S 120 EL",
-            "category": "Arbeitsbühnen",
+            "category": "Scherenbühnen",
             "subcategory": "Schere",
             "image": "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&q=80&w=600",
             "details": {
@@ -144,7 +165,7 @@
         {
             "id": "gs-25",
             "name": "Gabelstapler GS 25",
-            "category": "Stapler",
+            "category": "Gabelstapler",
             "subcategory": "Frontstapler",
             "image": "https://images.unsplash.com/photo-1589717013858-29b14db8355b?auto=format&fit=crop&q=80&w=600",
             "details": {
@@ -157,7 +178,7 @@
         {
             "id": "rt-40",
             "name": "Roto-Teleskopstapler R 40",
-            "category": "Stapler",
+            "category": "Roto-Stapler",
             "subcategory": "Roto",
             "image": "https://images.unsplash.com/photo-1518385888806-38d2239f6044?auto=format&fit=crop&q=80&w=600",
             "details": {
@@ -171,7 +192,7 @@
         {
             "id": "mb-100",
             "name": "Mastbühne MB 100",
-            "category": "Arbeitsbühnen",
+            "category": "Mastbühnen",
             "subcategory": "Mast",
             "image": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=600",
             "details": {
@@ -259,7 +280,7 @@
             "productName": "MB 80-E",
             "rentalStart": "2024-02-15",
             "rentalEnd": "2024-02-20",
-            "status": "pending",
+            "status": "cancelled",
             "date": "2024-01-31"
         },
         {

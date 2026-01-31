@@ -1,32 +1,45 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { products } from "@/data/mockProducts";
 import { ChevronRight, Filter, ArrowUpDown, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
-// Static metadata for the "All Products" page
-const allCategoriesMeta = {
+// Static meta info (could also be dynamic later)
+const pageMeta = {
     title: "Unser Mietpark",
     description: "Entdecken Sie unser gesamtes Sortiment an Hebebühnen, Staplern und Baumaschinen – für jeden Einsatz das passende Gerät.",
-    subcategories: [
-        { name: "Arbeitsbühnen", image: "https://images.unsplash.com/photo-1581094794329-cd132ad97c55?auto=format&fit=crop&q=80&w=600", link: "/mieten/arbeitsbuehnen" },
-        { name: "Stapler", image: "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?auto=format&fit=crop&q=80&w=600", link: "/mieten/stapler" },
-        { name: "Baumaschinen", image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&q=80&w=600", link: "/mieten/baumaschinen" },
-        { name: "Scherenbühnen", image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&q=80&w=600", link: "/mieten/arbeitsbuehnen" },
-        { name: "Gelenkteleskope", image: "https://images.unsplash.com/photo-1558227691-41ea78d1f631?auto=format&fit=crop&q=80&w=600", link: "/mieten/arbeitsbuehnen" },
-        { name: "LKW-Bühnen", image: "https://images.unsplash.com/photo-1578319439584-104c94d37305?auto=format&fit=crop&q=80&w=600", link: "/mieten/arbeitsbuehnen" },
-        { name: "Gabelstapler", image: "https://images.unsplash.com/photo-1589717013858-29b14db8355b?auto=format&fit=crop&q=80&w=600", link: "/mieten/stapler" },
-    ]
 };
 
 export default function AllProductsPage() {
-    // Determine products to show (All products)
-    const categoryProducts = useMemo(() => {
-        return products;
+    const [products, setProducts] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [prodRes, catRes] = await Promise.all([
+                    fetch('/api/admin/products'),
+                    fetch('/api/admin/categories')
+                ]);
+                const [prodData, catData] = await Promise.all([
+                    prodRes.json(),
+                    catRes.json()
+                ]);
+                setProducts(prodData);
+                setCategories(catData);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
     }, []);
+
+    if (loading) return null;
 
     return (
         <div className="min-h-screen bg-white dark:bg-zinc-950 pt-24 pb-20">
@@ -46,7 +59,7 @@ export default function AllProductsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-4 tracking-tight"
                 >
-                    {allCategoriesMeta.title}
+                    {pageMeta.title}
                 </motion.h1>
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
@@ -54,10 +67,10 @@ export default function AllProductsPage() {
                     transition={{ delay: 0.1 }}
                     className="text-lg text-zinc-500 max-w-2xl mb-12"
                 >
-                    {allCategoriesMeta.description}
+                    {pageMeta.description}
                 </motion.p>
 
-                {/* Subcategories / Categories Horizontal Scroll */}
+                {/* Categories Horizontal Scroll */}
                 <div className="relative group">
                     {/* Left Arrow */}
                     <button
@@ -88,8 +101,8 @@ export default function AllProductsPage() {
                         className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x scroll-smooth"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
-                        {allCategoriesMeta.subcategories.map((sub, idx) => (
-                            <Link key={sub.name} href={sub.link} className="flex-shrink-0 snap-start h-[320px] w-[260px]">
+                        {categories.map((sub, idx) => (
+                            <Link key={sub.name} href={sub.link || `/mieten/${sub.name.toLowerCase()}`} className="flex-shrink-0 snap-start h-[320px] w-[260px]">
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -102,7 +115,7 @@ export default function AllProductsPage() {
                                             src={sub.image}
                                             alt={sub.name}
                                             fill
-                                            className="object-cover transition-transform duration-700 group-hover/card:scale-110"
+                                            className="object-contain p-6 transition-transform duration-700 group-hover/card:scale-110"
                                             sizes="(max-width: 768px) 100vw, 33vw"
                                         />
 
@@ -136,7 +149,7 @@ export default function AllProductsPage() {
                         </button>
 
                         <div className="hidden md:block text-sm text-zinc-500 font-medium">
-                            {categoryProducts.length} Modelle verfügbar
+                            {products.length} Modelle verfügbar
                         </div>
 
                         <div className="flex items-center gap-6">
@@ -164,8 +177,8 @@ export default function AllProductsPage() {
             {/* Product Grid */}
             <div className="container mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {categoryProducts.length > 0 ? (
-                        categoryProducts.map((product, idx) => (
+                    {products.length > 0 ? (
+                        products.map((product, idx) => (
                             <motion.div
                                 key={product.id}
                                 initial={{ opacity: 0, y: 20 }}
@@ -178,12 +191,14 @@ export default function AllProductsPage() {
                                     {/* Decorative circle blur for depth */}
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/40 dark:bg-white/5 rounded-full blur-3xl" />
 
-                                    <Image
-                                        src={product.image}
-                                        alt={product.name}
-                                        fill
-                                        className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 z-10 drop-shadow-xl"
-                                    />
+                                    {product.image && (
+                                        <Image
+                                            src={product.image}
+                                            alt={product.name}
+                                            fill
+                                            className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 z-10 drop-shadow-xl"
+                                        />
+                                    )}
 
                                     {/* Availability Badge (Top Right) */}
                                     <div className="absolute top-5 right-5 z-20">
@@ -210,25 +225,25 @@ export default function AllProductsPage() {
 
                                     {/* Specs Grid */}
                                     <div className="grid grid-cols-2 gap-y-4 gap-x-4 mb-8">
-                                        {product.details.height && (
+                                        {product.details?.height && (
                                             <div className="flex flex-col">
                                                 <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Arbeitshöhe</span>
                                                 <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.height}</span>
                                             </div>
                                         )}
-                                        {product.details.reach && (
+                                        {product.details?.reach && (
                                             <div className="flex flex-col">
                                                 <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Reichweite</span>
                                                 <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.reach}</span>
                                             </div>
                                         )}
-                                        {product.details.load && (
+                                        {product.details?.load && (
                                             <div className="flex flex-col">
                                                 <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Tragkraft</span>
                                                 <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.load}</span>
                                             </div>
                                         )}
-                                        {product.details.power && (
+                                        {product.details?.power && (
                                             <div className="flex flex-col">
                                                 <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Antrieb</span>
                                                 <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.power}</span>
