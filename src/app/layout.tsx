@@ -16,6 +16,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Goetzrental | Modern Rental Platform",
   description: "Next generation technical rental solution.",
+  manifest: "/manifest.json",
+  themeColor: "#008080",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Goetz Admin",
+  },
 };
 
 export default function RootLayout({
