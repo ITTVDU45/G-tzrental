@@ -56,20 +56,26 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                         {/* Hero Section */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="relative aspect-[4/5] bg-zinc-50 dark:bg-zinc-900 rounded-[2.5rem] overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm">
-                                <Image
-                                    src={product.image}
-                                    alt={product.name}
-                                    fill
-                                    className="object-contain p-8"
-                                    priority
-                                />
+                                {product.image && typeof product.image === 'string' && (
+                                    <Image
+                                        src={product.image}
+                                        alt={product.name}
+                                        fill
+                                        className="object-contain p-8"
+                                        priority
+                                    />
+                                )}
                             </div>
                             <div className="flex flex-col gap-4">
                                 <div className="aspect-square relative bg-zinc-50 dark:bg-zinc-900 rounded-[2rem] overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                                    <Image src={product.image} alt="Detail 1" fill className="object-contain p-6 opacity-50" />
+                                    {product.image && typeof product.image === 'string' && (
+                                        <Image src={product.image} alt="Detail 1" fill className="object-contain p-6 opacity-50" />
+                                    )}
                                 </div>
                                 <div className="aspect-square relative bg-zinc-50 dark:bg-zinc-900 rounded-[2rem] overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                                    <Image src={product.image} alt="Detail 2" fill className="object-contain p-6 opacity-30 grayscale" />
+                                    {product.image && typeof product.image === 'string' && (
+                                        <Image src={product.image} alt="Detail 2" fill className="object-contain p-6 opacity-30 grayscale" />
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -97,9 +103,20 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                                     <p className="text-zinc-600 dark:text-zinc-400">
                                         {product.insuranceText || "Standard Maschinenbruchversicherung inklusive."}
                                     </p>
-                                    <div className="flex items-center gap-3 p-4 bg-brand-teal/10 rounded-2xl border border-brand-teal/20 text-brand-dark dark:text-brand-teal">
-                                        <ShieldCheck className="w-5 h-5 flex-shrink-0" />
-                                        <p className="text-sm font-medium">Sorglos mieten mit unserem Rundum-Schutzpaket.</p>
+                                    <div className="flex flex-col gap-3">
+                                        {product.insuranceBadges && product.insuranceBadges.length > 0 ? (
+                                            product.insuranceBadges.map((badge: { id: string, text: string }) => (
+                                                <div key={badge.id} className="flex items-center gap-3 p-4 bg-brand-teal/10 rounded-2xl border border-brand-teal/20 text-brand-dark dark:text-brand-teal">
+                                                    <ShieldCheck className="w-5 h-5 flex-shrink-0" />
+                                                    <p className="text-sm font-medium">{badge.text}</p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="flex items-center gap-3 p-4 bg-brand-teal/10 rounded-2xl border border-brand-teal/20 text-brand-dark dark:text-brand-teal">
+                                                <ShieldCheck className="w-5 h-5 flex-shrink-0" />
+                                                <p className="text-sm font-medium">Sorglos mieten mit unserem Rundum-Schutzpaket.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </AccordionItem>
@@ -120,12 +137,25 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
 
                             {/* Quick Stats Grid */}
                             <div className="grid grid-cols-2 gap-4 mb-8">
-                                <QuickStat icon={<LayoutGrid className="w-5 h-5" />} label="Arbeitshöhe" value={product.details.height || "-"} />
-                                <QuickStat icon={<ArrowRight className="w-5 h-5" />} label="Seitl. Reichweite" value={product.details.reach || "-"} />
-                                <QuickStat icon={<User className="w-5 h-5" />} label="max. Korblast" value={product.details.load || "-"} />
-                                <QuickStat icon={<Clock className="w-5 h-5" />} label="Antrieb" value={product.details.power || "-"} />
-                                <QuickStat icon={<Truck className="w-5 h-5" />} label="Breite" value={product.details.transportWidth || "-"} />
-                                <QuickStat icon={<Truck className="w-5 h-5" />} label="Gewicht" value={product.details.weight || "-"} />
+                                {Array.isArray(product.details) ? (
+                                    product.details.map((detail: { id: string, label: string, value: string }) => (
+                                        <QuickStat
+                                            key={detail.id}
+                                            icon={getIconForLabel(detail.label)}
+                                            label={detail.label}
+                                            value={detail.value}
+                                        />
+                                    ))
+                                ) : (
+                                    <>
+                                        <QuickStat icon={<LayoutGrid className="w-5 h-5" />} label="Arbeitshöhe" value={product.details.height || "-"} />
+                                        <QuickStat icon={<ArrowRight className="w-5 h-5" />} label="Seitl. Reichweite" value={product.details.reach || "-"} />
+                                        <QuickStat icon={<User className="w-5 h-5" />} label="max. Korblast" value={product.details.load || "-"} />
+                                        <QuickStat icon={<Clock className="w-5 h-5" />} label="Antrieb" value={product.details.power || "-"} />
+                                        <QuickStat icon={<Truck className="w-5 h-5" />} label="Breite" value={product.details.transportWidth || "-"} />
+                                        <QuickStat icon={<Scale className="w-5 h-5" />} label="Gewicht" value={product.details.weight || "-"} />
+                                    </>
+                                )}
                             </div>
 
                             {/* Booking Box */}
@@ -200,19 +230,54 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                             </h2>
                             <p className="text-zinc-500">Alle Spezifikationen des Modells <strong>{product.name}</strong> auf einen Blick.</p>
                         </div>
-                        <button className="flex items-center gap-3 px-8 py-4 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-[1.5rem] font-bold transition-all group">
-                            <Download className="w-5 h-5 text-brand-teal group-hover:scale-110 transition-transform" />
-                            <span>Datenblatt herunterladen (PDF)</span>
-                        </button>
+                        {product.datasheet && (
+                            <a
+                                href={product.datasheet}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 px-8 py-4 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-[1.5rem] font-bold transition-all group"
+                            >
+                                <Download className="w-5 h-5 text-brand-teal group-hover:scale-110 transition-transform" />
+                                <span>{product.datasheetName || "Datenblatt herunterladen (PDF)"}</span>
+                            </a>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-6">
-                        {product.fullSpecs && Object.entries(product.fullSpecs).map(([key, value]: [string, any]) => (
-                            <div key={key} className="flex justify-between py-4 border-b border-zinc-50 dark:border-zinc-900 group">
-                                <span className="text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors">{key}</span>
-                                <span className="font-bold text-zinc-900 dark:text-white group-hover:text-brand-teal transition-colors">{value}</span>
-                            </div>
-                        ))}
+                        {Array.isArray(product.details) ? (
+                            product.details.map((detail: { id: string, label: string, value: string }) => (
+                                <div key={detail.id} className="flex justify-between py-4 border-b border-zinc-50 dark:border-zinc-900 group">
+                                    <span className="text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors">{detail.label}</span>
+                                    <span className="font-bold text-zinc-900 dark:text-white group-hover:text-brand-teal transition-colors">{detail.value}</span>
+                                </div>
+                            ))
+                        ) : product.fullSpecs ? (
+                            Object.entries(product.fullSpecs).map(([key, value]: [string, any]) => (
+                                <div key={key} className="flex justify-between py-4 border-b border-zinc-50 dark:border-zinc-900 group">
+                                    <span className="text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors">{key}</span>
+                                    <span className="font-bold text-zinc-900 dark:text-white group-hover:text-brand-teal transition-colors">{value}</span>
+                                </div>
+                            ))
+                        ) : product.details ? (
+                            Object.entries(product.details).map(([key, value]: [string, any]) => {
+                                // Simple mapping for legacy details object
+                                const labelMap: Record<string, string> = {
+                                    height: "Arbeitshöhe",
+                                    reach: "Reichweite",
+                                    load: "Tragkraft",
+                                    power: "Antrieb",
+                                    weight: "Gewicht",
+                                    transportWidth: "Breite"
+                                };
+                                if (key === 'id') return null; // Skip id if present
+                                return (
+                                    <div key={key} className="flex justify-between py-4 border-b border-zinc-50 dark:border-zinc-900 group">
+                                        <span className="text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors">{labelMap[key] || key}</span>
+                                        <span className="font-bold text-zinc-900 dark:text-white group-hover:text-brand-teal transition-colors">{value}</span>
+                                    </div>
+                                );
+                            })
+                        ) : null}
                     </div>
                 </div>
                 {/* How it Works Section */}
@@ -358,7 +423,9 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                 <div className="bg-white dark:bg-zinc-900 rounded-[2rem] p-4 pr-6 flex items-center justify-between shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-zinc-100 dark:border-zinc-800">
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 relative bg-zinc-50 dark:bg-zinc-800 rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                            <Image src={product.image} alt={product.name} fill className="object-contain p-2" />
+                            {product.image && typeof product.image === 'string' && (
+                                <Image src={product.image} alt={product.name} fill className="object-contain p-2" />
+                            )}
                         </div>
                         <div>
                             <h4 className="font-bold text-zinc-900 dark:text-white leading-tight">{product.name}</h4>
@@ -449,12 +516,14 @@ function AlternativesList({ alternatives }: { alternatives: any[] }) {
                     {/* Top: Image Area */}
                     <Link href={`/mieten/geraet/${product.id}`} className="relative h-[240px] p-6 flex items-center justify-center overflow-hidden">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/40 dark:bg-white/5 rounded-full blur-3xl" />
-                        <Image
-                            src={product.image}
-                            alt={product.name}
-                            fill
-                            className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 z-10 drop-shadow-xl"
-                        />
+                        {product.image && typeof product.image === 'string' && (
+                            <Image
+                                src={product.image}
+                                alt={product.name}
+                                fill
+                                className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 z-10 drop-shadow-xl"
+                            />
+                        )}
                         <div className="absolute top-5 right-5 z-20">
                             <div className="flex items-center gap-2 bg-white/60 dark:bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-white/50 dark:border-white/10">
                                 <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse"></div>
@@ -538,4 +607,14 @@ function ProductFaq({ question, answer }: { question: string, answer: string }) 
             </AnimatePresence>
         </div>
     );
+}
+function getIconForLabel(label: string) {
+    const l = label.toLowerCase();
+    if (l.includes("höhe") || l.includes("height")) return <LayoutGrid className="w-5 h-5" />;
+    if (l.includes("reichweite") || l.includes("reach")) return <ArrowRight className="w-5 h-5" />;
+    if (l.includes("last") || l.includes("load") || l.includes("korblast")) return <User className="w-5 h-5" />;
+    if (l.includes("antrieb") || l.includes("power")) return <Clock className="w-5 h-5" />; // Or Zap? Using existing Clock for now as per previous code
+    if (l.includes("breite") || l.includes("width") || l.includes("transport")) return <Truck className="w-5 h-5" />;
+    if (l.includes("gewicht") || l.includes("weight")) return <Scale className="w-5 h-5" />;
+    return <Info className="w-5 h-5" />;
 }

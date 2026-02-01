@@ -114,13 +114,15 @@ export function CategorySlider() {
                         >
                             <Link href={cat.link || `/mieten/${cat.name.toLowerCase()}`} className="block h-full cursor-pointer">
                                 <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
-                                    <Image
-                                        src={cat.image}
-                                        alt={cat.name}
-                                        fill
-                                        className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                    />
+                                    {cat.image && typeof cat.image === 'string' && (
+                                        <Image
+                                            src={cat.image}
+                                            alt={cat.name}
+                                            fill
+                                            className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        />
+                                    )}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                 </div>
                                 <div className="pt-4 text-center">

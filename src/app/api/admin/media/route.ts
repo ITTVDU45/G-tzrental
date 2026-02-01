@@ -26,7 +26,7 @@ export async function GET() {
         url: `/uploads/${file}`,
         size: 0, // Could get actual size if needed
         type: path.extname(file).slice(1)
-    })).filter(item => ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(item.type.toLowerCase()));
+    })).filter(item => ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'pdf'].includes(item.type.toLowerCase()));
 
     return NextResponse.json(media);
 }

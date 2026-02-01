@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
     LayoutDashboard,
@@ -14,7 +15,8 @@ import {
     ChevronRight,
     Menu,
     X,
-    Image as ImageIcon
+    Image as ImageIcon,
+    MapPin
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,7 +25,7 @@ const menuItems = [
     { title: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
     { title: 'Mediathek', icon: ImageIcon, href: '/admin/media' },
     { title: 'Anfragen', icon: MessageSquare, href: '/admin/inquiries' },
-    { title: 'Seiten', icon: FileText, href: '/admin/pages' },
+    { title: 'Standorte', icon: MapPin, href: '/admin/pages' },
     { title: 'Kategorien', icon: Layers, href: '/admin/categories' },
     { title: 'Produkte', icon: Box, href: '/admin/products' },
     { title: 'Testimonials', icon: MessageSquare, href: '/admin/testimonials' },
@@ -53,17 +55,16 @@ export default function Sidebar() {
     const SidebarContent = () => (
         <div className="flex flex-col h-full bg-white dark:bg-zinc-900">
             <div className="p-8">
-                <div className="flex items-center justify-between mb-10">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-brand-teal rounded-xl flex items-center justify-center text-white font-black italic shadow-lg shadow-brand-teal/20">
-                            G
-                        </div>
-                        <div>
-                            <h2 className="font-black text-zinc-900 dark:text-white uppercase tracking-tighter leading-tight">Götz Admin</h2>
-                            <p className="text-[10px] text-zinc-400 font-bold tracking-widest uppercase">Content Manager</p>
-                        </div>
+                <div className="mb-10 relative">
+                    <div className="relative w-full h-16">
+                        <Image
+                            src="/GötzRental2.png"
+                            alt="Götz Rental Logo"
+                            fill
+                            className="object-contain"
+                        />
                     </div>
-                    <button onClick={() => setIsOpen(false)} className="lg:hidden p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                    <button onClick={() => setIsOpen(false)} className="lg:hidden absolute top-0 right-0 p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
                         <X className="w-6 h-6" />
                     </button>
                 </div>
@@ -114,8 +115,13 @@ export default function Sidebar() {
             {/* Mobile Header */}
             <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between px-6 z-[60]">
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-brand-teal rounded-lg flex items-center justify-center text-white font-black text-xs italic">
-                        G
+                    <div className="relative w-8 h-8 rounded-lg overflow-hidden">
+                        <Image
+                            src="/GötzRental2.png"
+                            alt="Götz Rental Logo"
+                            fill
+                            className="object-contain"
+                        />
                     </div>
                 </div>
                 <button

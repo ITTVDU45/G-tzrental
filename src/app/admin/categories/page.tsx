@@ -12,6 +12,9 @@ interface Category {
     image: string;
     link: string;
     count: number;
+    description?: string;
+    parentCategory?: string;
+    tags?: { id: string; text: string }[];
 }
 
 export default function AdminCategoriesPage() {
@@ -58,7 +61,9 @@ export default function AdminCategoriesPage() {
             accessor: (item: Category) => (
                 <div className="flex items-center gap-4">
                     <div className="w-16 h-10 relative bg-zinc-50 dark:bg-zinc-800 rounded-lg overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                        <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        {item.image && typeof item.image === 'string' && (
+                            <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        )}
                     </div>
                     <span className="font-bold text-zinc-900 dark:text-white">{item.name}</span>
                 </div>
@@ -111,6 +116,7 @@ export default function AdminCategoriesPage() {
                 onCloseAction={() => setIsModalOpen(false)}
                 onSaveAction={handleSave}
                 category={selectedCategory}
+                allCategories={categories}
             />
         </div>
     );

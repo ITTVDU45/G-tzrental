@@ -26,9 +26,9 @@ export default function Home() {
       <ProductGridSection />
       <LargeProductCarousel />
       <CtaSection />
-      <TestimonialsSection />
+      <TestimonialsSection pageId="page-1" />
       <FaqSection />
-      <BlogSection />
+      <BlogSection pageId="page-1" />
       <FinalCtaSection />
 
       <ProductSelector

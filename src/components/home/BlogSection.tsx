@@ -4,7 +4,11 @@ import Link from "next/link";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 
-export function BlogSection() {
+interface BlogSectionProps {
+    pageId?: string;
+}
+
+export function BlogSection({ pageId }: BlogSectionProps) {
     const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -13,8 +17,13 @@ export function BlogSection() {
             try {
                 const res = await fetch('/api/admin/blog');
                 const data = await res.json();
-                // Filter published posts
-                setPosts(data.filter((p: any) => p.status === 'published').slice(0, 3));
+
+                // Filter by status and pageId
+                const filtered = data
+                    .filter((p: any) => p.status === 'published')
+                    .filter((p: any) => !pageId || !p.pageIds || p.pageIds.length === 0 || p.pageIds.includes(pageId));
+
+                setPosts(filtered.slice(0, 3));
             } catch (err) {
                 console.error(err);
             } finally {
@@ -22,7 +31,7 @@ export function BlogSection() {
             }
         };
         fetchPosts();
-    }, []);
+    }, [pageId]);
 
     if (loading || posts.length === 0) return null;
 
@@ -64,18 +73,22 @@ export function BlogSection() {
                                 <div className="bg-white dark:bg-zinc-900 rounded-[2rem] overflow-hidden hover:shadow-2xl transition-all duration-500 border border-zinc-100 dark:border-zinc-800">
                                     {/* Image */}
                                     <div className="relative h-[240px] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                                        <Image
-                                            src={post.image}
-                                            alt={post.title}
-                                            fill
-                                            className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                        />
+                                        {post.image && typeof post.image === 'string' && (
+                                            <Image
+                                                src={post.image}
+                                                alt={post.title}
+                                                fill
+                                                className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                            />
+                                        )}
 
-                                        {/* Category Badge */}
-                                        <div className="absolute top-4 left-4">
-                                            <span className="px-3 py-1.5 bg-white/90 dark:bg-black/90 backdrop-blur-sm rounded-full text-xs font-bold uppercase tracking-wide text-brand-teal border border-white/50 dark:border-zinc-700">
-                                                {post.category}
-                                            </span>
+                                        {/* Category Badges */}
+                                        <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                                            {(post.categories && post.categories.length > 0 ? post.categories : [post.category].filter(Boolean)).map((cat: string) => (
+                                                <span key={cat} className="px-3 py-1.5 bg-white/90 dark:bg-black/90 backdrop-blur-sm rounded-full text-[10px] font-black uppercase tracking-wide text-brand-teal border border-white/50 dark:border-zinc-700">
+                                                    {cat}
+                                                </span>
+                                            ))}
                                         </div>
                                     </div>
 

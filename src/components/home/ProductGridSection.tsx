@@ -90,12 +90,14 @@ export function ProductGridSection() {
                                 {/* Decorative circle blur for depth */}
                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/40 dark:bg-white/5 rounded-full blur-3xl" />
 
-                                <Image
-                                    src={product.image}
-                                    alt={product.name}
-                                    fill
-                                    className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 z-10 drop-shadow-xl"
-                                />
+                                {product.image && typeof product.image === 'string' && (
+                                    <Image
+                                        src={product.image}
+                                        alt={product.name}
+                                        fill
+                                        className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 z-10 drop-shadow-xl"
+                                    />
+                                )}
 
                                 {/* Availability Badge (Top Right) */}
                                 <div className="absolute top-5 right-5 z-20">

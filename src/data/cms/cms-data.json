@@ -12,7 +12,13 @@
             "title": "Startseite",
             "slug": "/",
             "status": "published",
-            "lastModified": "2024-01-30"
+            "lastModified": "2024-01-30",
+            "productIds": [
+                "tb-160",
+                "mb-80-e",
+                "s-120-el"
+            ],
+            "name": "Duesseldorf"
         },
         {
             "id": "page-2",
@@ -78,6 +84,13 @@
             "image": "/Rotostabler.png",
             "link": "/mieten/roto-stapler",
             "count": 7
+        },
+        {
+            "name": "test",
+            "image": "",
+            "link": "/mieten/test",
+            "count": 0,
+            "id": "cat-1769885713594"
         }
     ],
     "products": [
@@ -214,6 +227,36 @@
                 "power": "Diesel"
             },
             "price": 220
+        },
+        {
+            "name": "testprodukt",
+            "category": "test",
+            "subcategory": "testunterkategorie",
+            "image": "",
+            "description": "beschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung testbeschreibung test",
+            "price": 100,
+            "details": {
+                "height": "9",
+                "reach": "3",
+                "load": "299",
+                "power": "Elektro"
+            },
+            "id": "58x41lc13",
+            "insuranceBadges": [
+                {
+                    "id": "1769887059281",
+                    "text": "Ohne eigenbeteiligung"
+                },
+                {
+                    "id": "1769886891113",
+                    "text": "Sorglos mieten mit unserem Rundum-Schutzpaket."
+                },
+                {
+                    "id": "1769886906260",
+                    "text": "testbadge"
+                }
+            ],
+            "insuranceText": "Standard Maschinenbruchversicherung inklusive.testtesttest"
         }
     ],
     "testimonials": [

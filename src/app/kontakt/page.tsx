@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, MessageCircle, Clock, CheckCircle2, Truck, Lock, CreditCard, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { TestimonialsSection } from "@/components/home/TestimonialsSection";
+import { BlogSection } from "@/components/home/BlogSection";
 
 export default function ContactPage() {
     return (
@@ -289,6 +291,12 @@ export default function ContactPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Testimonials */}
+            <TestimonialsSection pageId="page-4" />
+
+            {/* Blog Section */}
+            <BlogSection pageId="page-4" />
 
             {/* Floating FAB */}
             <div className="fixed bottom-8 right-8 z-50">

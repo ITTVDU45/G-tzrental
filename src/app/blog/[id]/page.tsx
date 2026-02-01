@@ -45,9 +45,13 @@ export default function BlogDetailPage() {
                     </div>
 
                     <div className="flex flex-col gap-6 mb-12">
-                        <span className="w-fit bg-brand-teal/10 text-brand-teal px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-brand-teal/20">
-                            {post.category}
-                        </span>
+                        <div className="flex flex-wrap gap-2">
+                            {(post.categories && post.categories.length > 0 ? post.categories : [post.category].filter(Boolean)).map((cat: string) => (
+                                <span key={cat} className="bg-brand-teal/10 text-brand-teal px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-brand-teal/20">
+                                    {cat}
+                                </span>
+                            ))}
+                        </div>
                         <h1 className="text-4xl md:text-6xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter leading-[1.1]">
                             {post.title}
                         </h1>
@@ -73,42 +77,42 @@ export default function BlogDetailPage() {
 
                 {/* Content Area */}
                 <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr,240px] gap-20">
-                    <article className="prose prose-zinc dark:prose-invert max-w-none">
+                    <article className="max-w-none">
                         <p className="text-xl md:text-2xl text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed italic border-l-4 border-brand-teal pl-8 mb-12">
                             {post.excerpt}
                         </p>
 
-                        <div className="space-y-8 text-zinc-700 dark:text-zinc-300 text-lg leading-relaxed font-medium">
-                            <p>
-                                Bei der Arbeit mit Hebebühnen und anderen motorisierten Baumaschinen steht die Sicherheit an erster Stelle. Jedes Jahr ändern sich Anforderungen und Standards, um den Arbeitsalltag noch sicherer zu gestalten. In diesem Ratgeber fassen wir die wichtigsten Neuerungen zusammen.
-                            </p>
+                        <div
+                            className="blog-content space-y-8 text-zinc-700 dark:text-zinc-300 text-lg leading-relaxed font-medium"
+                            dangerouslySetInnerHTML={{ __html: post.content || "" }}
+                        />
 
-                            <h2 className="text-3xl font-black text-zinc-900 dark:text-white uppercase tracking-tight mt-12 mb-6">
-                                Unterweisung ist Pflicht
-                            </h2>
-                            <p>
-                                Eine der am häufigsten unterschätzten Regeln ist die jährliche Sicherheitsunterweisung. Es reicht nicht aus, das Gerät einmal bedient zu haben. Jeder Bediener muss nachweislich in die spezifischen Funktionen und Gefahrenquellen eingewiesen sein.
-                            </p>
-
-                            <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[2rem] p-8 my-12">
-                                <h4 className="font-black text-zinc-900 dark:text-white uppercase text-sm mb-4">Checkliste vor dem Einsatz:</h4>
-                                <ul className="space-y-3 m-0 list-none p-0">
-                                    {['Sichtprüfung auf Leckagen', 'Funktionskontrolle aller Not-Aus-Schalter', 'Prüfung der Tragfähigkeit des Untergrunds', 'Absicherung des Arbeitsbereichs'].map(item => (
-                                        <li key={item} className="flex items-center gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-brand-teal" />
-                                            <span className="text-sm font-bold text-zinc-600 dark:text-zinc-400">{item}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                        {/* Fallback for posts without content (seeding) */}
+                        {!post.content && (
+                            <div className="space-y-8 text-zinc-700 dark:text-zinc-300 text-lg leading-relaxed font-medium">
+                                <p>
+                                    Bei der Arbeit mit Hebebühnen und anderen motorisierten Baumaschinen steht die Sicherheit an erster Stelle. Jedes Jahr ändern sich Anforderungen und Standards, um den Arbeitsalltag noch sicherer zu gestalten. In diesem Ratgeber fassen wir die wichtigsten Neuerungen zusammen.
+                                </p>
+                                <h2 className="text-3xl font-black text-zinc-900 dark:text-white uppercase tracking-tight mt-12 mb-6">
+                                    Unterweisung ist Pflicht
+                                </h2>
+                                <p>
+                                    Eine der am häufigsten unterschätzten Regeln ist die jährliche Sicherheitsunterweisung. Es reicht nicht aus, das Gerät einmal bedient zu haben. Jeder Bediener muss nachweislich in die spezifischen Funktionen und Gefahrenquellen eingewiesen sein.
+                                </p>
                             </div>
+                        )}
 
-                            <h2 className="text-3xl font-black text-zinc-900 dark:text-white uppercase tracking-tight mt-12 mb-6">
-                                PSA gegen Absturz
-                            </h2>
-                            <p>
-                                Das Tragen von persönlicher Schutzausrüstung (PSA) ist in vielen Bühnentypen, insbesondere in Teleskop- und Gelenkbühnen, aufgrund des Peitscheneffekts absolut lebensnotwendig. Ein kurzer Auffanggurt kann im Ernstfall den entscheidenden Unterschied machen.
-                            </p>
-                        </div>
+                        <style jsx global>{`
+                            .blog-content h1 { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin-top: 3rem; margin-bottom: 1.5rem; letter-spacing: -0.05em; color: var(--brand-dark, #18181b); }
+                            .blog-content h2 { font-size: 2.25rem; font-weight: 900; text-transform: uppercase; margin-top: 2.5rem; margin-bottom: 1.25rem; letter-spacing: -0.025em; color: var(--brand-dark, #18181b); }
+                            .blog-content h3 { font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-top: 2rem; margin-bottom: 1rem; color: var(--brand-dark, #18181b); }
+                            .dark .blog-content h1, .dark .blog-content h2, .dark .blog-content h3 { color: white; }
+                            .blog-content p { margin-bottom: 1.5rem; }
+                            .blog-content ul, .blog-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+                            .blog-content li { margin-bottom: 0.5rem; }
+                            .blog-content a { color: #008080; text-decoration: underline; font-weight: 700; }
+                            .blog-content blockquote { border-left: 4px solid #008080; padding-left: 1.5rem; font-style: italic; color: #71717a; }
+                        `}</style>
                     </article>
 
                     {/* Sidebar */}

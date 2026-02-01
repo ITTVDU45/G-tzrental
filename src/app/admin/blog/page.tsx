@@ -14,6 +14,7 @@ interface BlogPost {
     date: string;
     readTime: string;
     status: string;
+    pageIds?: string[];
 }
 
 export default function AdminBlogPage() {
@@ -21,6 +22,7 @@ export default function AdminBlogPage() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+    const [pages, setPages] = useState<any[]>([]);
 
     const fetchPosts = async () => {
         try {
@@ -36,15 +38,22 @@ export default function AdminBlogPage() {
 
     useEffect(() => {
         fetchPosts();
+        fetch('/api/admin/pages')
+            .then(res => res.json())
+            .then(data => setPages(data))
+            .catch(err => console.error(err));
     }, []);
 
     const columns = [
+        // ... (columns remains same)
         {
             header: 'Beitrag',
             accessor: (item: BlogPost) => (
                 <div className="flex items-center gap-4">
                     <div className="w-16 h-10 relative bg-zinc-50 dark:bg-zinc-800 rounded-lg overflow-hidden border border-zinc-100 dark:border-zinc-800 flex-shrink-0">
-                        <Image src={item.image} alt={item.title} fill className="object-cover" />
+                        {item.image && typeof item.image === 'string' && (
+                            <Image src={item.image} alt={item.title} fill className="object-cover" />
+                        )}
                     </div>
                     <span className="font-bold text-zinc-900 dark:text-white line-clamp-1">{item.title}</span>
                 </div>
@@ -52,9 +61,18 @@ export default function AdminBlogPage() {
         },
         {
             header: 'Kategorie',
-            accessor: (item: BlogPost) => (
-                <span className="text-xs font-bold text-brand-teal bg-brand-teal/10 px-3 py-1 rounded-full uppercase tracking-widest">{item.category}</span>
-            )
+            accessor: (item: any) => {
+                const cats = item.categories && item.categories.length > 0 ? item.categories : [item.category].filter(Boolean);
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {cats.map((cat: string) => (
+                            <span key={cat} className="text-[10px] font-bold text-brand-teal bg-brand-teal/10 px-2 py-0.5 rounded-full uppercase tracking-widest">
+                                {cat}
+                            </span>
+                        ))}
+                    </div>
+                );
+            }
         },
         { header: 'Datum', accessor: 'date' as const },
         {
@@ -122,6 +140,7 @@ export default function AdminBlogPage() {
                 onCloseAction={() => setIsModalOpen(false)}
                 onSaveAction={handleSave}
                 post={selectedPost}
+                pages={pages}
             />
         </div>
     );

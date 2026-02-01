@@ -3,7 +3,11 @@ import Image from "next/image";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-export function TestimonialsSection() {
+interface TestimonialsSectionProps {
+    pageId?: string;
+}
+
+export function TestimonialsSection({ pageId }: TestimonialsSectionProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [testimonials, setTestimonials] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -13,7 +17,13 @@ export function TestimonialsSection() {
             try {
                 const res = await fetch('/api/admin/testimonials');
                 const data = await res.json();
-                setTestimonials(data);
+
+                // Filter by pageId if provided
+                const filtered = pageId
+                    ? data.filter((t: any) => !t.pageIds || t.pageIds.length === 0 || t.pageIds.includes(pageId))
+                    : data;
+
+                setTestimonials(filtered);
             } catch (err) {
                 console.error(err);
             } finally {
@@ -21,7 +31,7 @@ export function TestimonialsSection() {
             }
         };
         fetchTestimonials();
-    }, []);
+    }, [pageId]);
 
     const scroll = (direction: "left" | "right") => {
         if (scrollRef.current) {
@@ -81,12 +91,14 @@ export function TestimonialsSection() {
                                 }`}>
                                 {/* Image Block */}
                                 <div className="w-full md:w-5/12 aspect-[4/3] md:aspect-auto relative">
-                                    <Image
-                                        src={item.image}
-                                        alt={item.name}
-                                        fill
-                                        className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
-                                    />
+                                    {item.image && typeof item.image === 'string' && (
+                                        <Image
+                                            src={item.image}
+                                            alt={item.name}
+                                            fill
+                                            className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                                        />
+                                    )}
                                 </div>
 
                                 {/* Content Block */}

@@ -33,18 +33,27 @@ export default function AdminTestimonialsPage() {
         }
     };
 
+    const [pages, setPages] = useState<any[]>([]);
+
     useEffect(() => {
         fetchTestimonials();
+        // Fetch pages for selection
+        fetch('/api/admin/pages')
+            .then(res => res.json())
+            .then(data => setPages(data))
+            .catch(err => console.error(err));
     }, []);
 
     const columns = [
-        // ... (columns logic remains same)
+        // ... (columns code)
         {
             header: 'Kunde',
             accessor: (item: Testimonial) => (
                 <div className="flex items-center gap-4">
                     <div className="w-10 h-10 relative bg-zinc-50 dark:bg-zinc-800 rounded-full overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                        <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        {item.image && typeof item.image === 'string' && (
+                            <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        )}
                     </div>
                     <div>
                         <p className="font-bold text-zinc-900 dark:text-white">{item.name}</p>
@@ -124,6 +133,7 @@ export default function AdminTestimonialsPage() {
                 onCloseAction={() => setIsModalOpen(false)}
                 onSaveAction={handleSave}
                 testimonial={selectedTestimonial}
+                pages={pages}
             />
         </div>
     );

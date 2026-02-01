@@ -1,121 +1,73 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState, useMemo, use } from "react";
+import { useState, useEffect, use } from "react";
 import { motion } from "framer-motion";
-import { products, Product } from "@/data/mockProducts";
 import { ChevronRight, Filter, ArrowUpDown, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
-// Metadata for categories
-const categoryMeta: Record<string, {
+// Define interfaces for our data
+interface Product {
+    id: string;
+    name: string;
+    category: string;
+    subcategory: string;
+    image: string;
+    price: number | string;
+    details: any;
+    [key: string]: any;
+}
+
+interface CategoryMeta {
     title: string;
     description: string;
-    heroImage: string;
+    heroImage?: string;
     subcategories: { name: string; image: string }[];
-}> = {
-    "arbeitsbuehnen": {
-        title: "Arbeitsbühne mieten",
-        description: "Über 170 geprüfte Modelle – sicher, flexibel und sofort verfügbar für jeden Einsatz",
-        heroImage: "https://images.unsplash.com/photo-1581094794329-cd132ad97c55?auto=format&fit=crop&q=80&w=1200",
-        subcategories: [
-            { name: "Gelenkteleskope", image: "https://images.unsplash.com/photo-1558227691-41ea78d1f631?auto=format&fit=crop&q=80&w=200" },
-            { name: "Teleskopbühnen", image: "https://images.unsplash.com/photo-1581094794329-cd132ad97c55?auto=format&fit=crop&q=80&w=200" },
-            { name: "Scherenbühnen", image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&q=80&w=200" },
-            { name: "LKW-Bühnen", image: "https://images.unsplash.com/photo-1578319439584-104c94d37305?auto=format&fit=crop&q=80&w=200" },
-            { name: "Anhängerbühne", image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=200" },
-            { name: "Raupenbühnen", image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=200" },
-            { name: "Vertikalmastbüh", image: "https://images.unsplash.com/photo-1621905252507-b35a83013b5b?auto=format&fit=crop&q=80&w=200" },
-        ]
-    },
-    "stapler": {
-        title: "Stapler mieten",
-        description: "Leistungsstarke Gabelstapler und Teleskoplader für jede Hubhöhe und Tragkraft",
-        heroImage: "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?auto=format&fit=crop&q=80&w=1200",
-        subcategories: [
-            { name: "Gabelstapler", image: "https://images.unsplash.com/photo-1589717013858-29b14db8355b?auto=format&fit=crop&q=80&w=200" },
-            { name: "Geländestapler", image: "https://images.unsplash.com/photo-1518385888806-38d2239f6044?auto=format&fit=crop&q=80&w=200" },
-            { name: "Telestapler", image: "https://images.unsplash.com/photo-1578319439584-104c94d37305?auto=format&fit=crop&q=80&w=200" },
-            { name: "Rotostapler", image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&q=80&w=200" },
-        ]
-    },
-    "baumaschinen": {
-        title: "Baumaschinen mieten",
-        description: "Robuste Bagger, Radlader und mehr für Ihre Baustelle",
-        heroImage: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&q=80&w=1200",
-        subcategories: [
-            { name: "Minibagger", image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&q=80&w=200" },
-            { name: "Radlader", image: "https://images.unsplash.com/photo-1519003300449-424ad0405076?auto=format&fit=crop&q=80&w=200" },
-            { name: "Dumper", image: "https://images.unsplash.com/photo-1580901368919-7738ef321abd?auto=format&fit=crop&q=80&w=200" }
-        ]
-    }
-};
-
-type CategoryData = {
-    meta: typeof categoryMeta[string];
-    type: string;
-    subFilter: string | null;
-};
-
-// Helper to get category data including aliases
-const getCategoryData = (slug: string): CategoryData => {
-    if (!slug) return { meta: categoryMeta['arbeitsbuehnen'], type: 'Arbeitsbühnen', subFilter: null };
-
-    // Decode URL and normalize (replace umlauts for key matching if needed)
-    const decoded = decodeURIComponent(slug).toLowerCase();
-
-    // Normalization helper
-    const normalize = (str: string) => str.replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
-    const s = normalize(decoded);
-
-    // 1. Direct match with normalized keys
-    if (categoryMeta[s]) {
-        return { meta: categoryMeta[s], type: s.split('-')[0].charAt(0).toUpperCase() + s.slice(1), subFilter: null };
-    }
-
-    // 2. Map known categories
-    if (s.includes('arbeitsbuehne') || s.includes('buehne')) return { meta: categoryMeta['arbeitsbuehnen'], type: 'Arbeitsbühnen', subFilter: null };
-    if (s.includes('stapler') || s.includes('hubwagen')) return { meta: categoryMeta['stapler'], type: 'Stapler', subFilter: null };
-    if (s.includes('bagger') || s.includes('lader') || s.includes('baumaschine')) return { meta: categoryMeta['baumaschinen'], type: 'Baumaschinen', subFilter: null };
-
-    // 3. Fallback
-    return { meta: categoryMeta['arbeitsbuehnen'], type: 'Arbeitsbühnen', subFilter: null };
-};
+}
 
 export default function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
     const { category } = use(params);
-    const { meta, type: targetCategory, subFilter } = getCategoryData(category);
+    const [meta, setMeta] = useState<CategoryMeta | null>(null);
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
-    const categoryProducts = useMemo(() => {
-        let filtered = products;
+    useEffect(() => {
+        setLoading(true);
+        fetch(`/api/categories/${category}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch');
+                return res.json();
+            })
+            .then(data => {
+                setMeta(data.meta);
+                setProducts(data.products || []);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setError(true);
+                setLoading(false);
+            });
+    }, [category]);
 
-        // Filter by main category
-        if (targetCategory) {
-            const typeMap: Record<string, string> = {
-                'arbeitsbuehnen': 'Arbeitsbühnen',
-                'stapler': 'Stapler',
-                'baumaschinen': 'Baumaschinen'
-            };
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-white dark:bg-zinc-950 pt-32 flex justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-teal"></div>
+            </div>
+        );
+    }
 
-            // Normalize targetCategory for strict matching against mockProducts types
-            const normType = targetCategory.toLowerCase().replace(/ü/g, 'ue').replace(/ä/g, 'ae');
-            let mapped = targetCategory;
-
-            if (normType.includes('stapler')) mapped = 'Stapler';
-            else if (normType.includes('baumaschinen')) mapped = 'Baumaschinen';
-            else if (normType.includes('arbeitsbuehnen') || normType.includes('buehne')) mapped = 'Arbeitsbühnen';
-
-            filtered = products.filter(p => p.category === mapped);
-        }
-
-        // Filter by subcategory if applicable 
-        if (subFilter) {
-            filtered = filtered.filter(p => p.subcategory.toLowerCase().includes(subFilter.toLowerCase()));
-        }
-
-        return filtered;
-    }, [targetCategory, subFilter]);
+    if (error || !meta) {
+        return (
+            <div className="min-h-screen bg-white dark:bg-zinc-950 pt-32 text-center text-zinc-500">
+                <h1 className="text-2xl font-bold mb-4">Kategorie nicht gefunden</h1>
+                <Link href="/mieten" className="text-brand-teal hover:underline">Zurück zur Übersicht</Link>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-white dark:bg-zinc-950 pt-24 pb-20">
@@ -126,7 +78,7 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
                     <ChevronRight className="w-4 h-4" />
                     <Link href="/mieten" className="hover:text-brand-teal">Geräte</Link>
                     <ChevronRight className="w-4 h-4" />
-                    <span className="text-zinc-900 dark:text-white font-medium capitalize">{meta.title.replace(" mieten", "")}</span>
+                    <span className="text-zinc-900 dark:text-white font-medium capitalize">{meta.title?.replace(" mieten", "") || category}</span>
                 </div>
             </div>
 
@@ -149,71 +101,75 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
                 </motion.p>
 
                 {/* Subcategories Horizontal Scroll */}
-                <div className="relative group">
-                    {/* Left Arrow */}
-                    <button
-                        onClick={() => {
-                            const container = document.getElementById('subcategory-scroll-container');
-                            if (container) container.scrollBy({ left: -300, behavior: 'smooth' });
-                        }}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 w-10 h-10 bg-white dark:bg-zinc-800 rounded-full shadow-lg flex items-center justify-center text-zinc-700 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-brand-teal hover:text-white"
-                        aria-label="Scroll left"
-                    >
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
+                {meta.subcategories && meta.subcategories.length > 0 && (
+                    <div className="relative group">
+                        {/* Left Arrow */}
+                        <button
+                            onClick={() => {
+                                const container = document.getElementById('subcategory-scroll-container');
+                                if (container) container.scrollBy({ left: -300, behavior: 'smooth' });
+                            }}
+                            className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 w-10 h-10 bg-white dark:bg-zinc-800 rounded-full shadow-lg flex items-center justify-center text-zinc-700 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-brand-teal hover:text-white"
+                            aria-label="Scroll left"
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
 
-                    {/* Right Arrow */}
-                    <button
-                        onClick={() => {
-                            const container = document.getElementById('subcategory-scroll-container');
-                            if (container) container.scrollBy({ left: 300, behavior: 'smooth' });
-                        }}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 w-10 h-10 bg-white dark:bg-zinc-800 rounded-full shadow-lg flex items-center justify-center text-zinc-700 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-brand-teal hover:text-white"
-                        aria-label="Scroll right"
-                    >
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
+                        {/* Right Arrow */}
+                        <button
+                            onClick={() => {
+                                const container = document.getElementById('subcategory-scroll-container');
+                                if (container) container.scrollBy({ left: 300, behavior: 'smooth' });
+                            }}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 w-10 h-10 bg-white dark:bg-zinc-800 rounded-full shadow-lg flex items-center justify-center text-zinc-700 dark:text-zinc-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-brand-teal hover:text-white"
+                            aria-label="Scroll right"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
 
-                    <div
-                        id="subcategory-scroll-container"
-                        className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x scroll-smooth"
-                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                    >
-                        {meta.subcategories.map((sub, idx) => (
-                            <motion.div
-                                key={sub.name}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: idx * 0.05 + 0.2 }}
-                                className="flex-shrink-0 snap-start h-[320px] w-[260px]"
-                            >
-                                <div className="group/card relative h-full w-full rounded-[2rem] shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer">
-                                    {/* Background Image */}
-                                    <Image
-                                        src={sub.image}
-                                        alt={sub.name}
-                                        fill
-                                        className="object-cover transition-transform duration-700 group-hover/card:scale-110"
-                                        sizes="(max-width: 768px) 100vw, 33vw"
-                                    />
+                        <div
+                            id="subcategory-scroll-container"
+                            className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x scroll-smooth"
+                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
+                            {meta.subcategories.map((sub, idx) => (
+                                <motion.div
+                                    key={sub.name}
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: idx * 0.05 + 0.2 }}
+                                    className="flex-shrink-0 snap-start h-[200px] w-[180px] md:h-[320px] md:w-[260px]"
+                                >
+                                    <div className="group/card relative h-full w-full rounded-[2rem] shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer bg-zinc-100 dark:bg-zinc-800">
+                                        {/* Background Image */}
+                                        {sub.image && typeof sub.image === 'string' && (
+                                            <Image
+                                                src={sub.image}
+                                                alt={sub.name}
+                                                fill
+                                                className="object-cover transition-transform duration-700 group-hover/card:scale-110"
+                                                sizes="(max-width: 768px) 100vw, 33vw"
+                                            />
+                                        )}
 
-                                    {/* Overlay Gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover/card:opacity-90 transition-opacity duration-300" />
+                                        {/* Overlay Gradient */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover/card:opacity-90 transition-opacity duration-300" />
 
-                                    {/* Content */}
-                                    <div className="absolute inset-0 p-6 flex flex-col justify-end z-10">
-                                        <div className="transform translate-y-2 group-hover/card:translate-y-0 transition-transform duration-300">
-                                            <h3 className="text-xl font-bold text-white leading-tight mb-2">
-                                                {sub.name}
-                                            </h3>
-                                            <div className="h-0.5 w-12 bg-brand-teal group-hover/card:w-full transition-all duration-500" />
+                                        {/* Content */}
+                                        <div className="absolute inset-0 p-6 flex flex-col justify-end z-10">
+                                            <div className="transform translate-y-2 group-hover/card:translate-y-0 transition-transform duration-300">
+                                                <h3 className="text-xl font-bold text-white leading-tight mb-2">
+                                                    {sub.name}
+                                                </h3>
+                                                <div className="h-0.5 w-12 bg-brand-teal group-hover/card:w-full transition-all duration-500" />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* Shop Controls */}
@@ -225,9 +181,8 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
                             Filter
                         </button>
 
-                        {/* Search / Result Count placeholder or empty space since Toggle is gone */}
                         <div className="hidden md:block text-sm text-zinc-500 font-medium">
-                            {categoryProducts.length} Modelle verfügbar
+                            {products.length} Modelle verfügbar
                         </div>
 
                         <div className="flex items-center gap-6">
@@ -255,8 +210,8 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
             {/* Product Grid */}
             <div className="container mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {categoryProducts.length > 0 ? (
-                        categoryProducts.map((product, idx) => (
+                    {products.length > 0 ? (
+                        products.map((product, idx) => (
                             <motion.div
                                 key={product.id}
                                 initial={{ opacity: 0, y: 20 }}
@@ -269,12 +224,14 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
                                     {/* Decorative circle blur for depth */}
                                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/40 dark:bg-white/5 rounded-full blur-3xl" />
 
-                                    <Image
-                                        src={product.image}
-                                        alt={product.name}
-                                        fill
-                                        className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 z-10 drop-shadow-xl"
-                                    />
+                                    {product.image && typeof product.image === 'string' && (
+                                        <Image
+                                            src={product.image}
+                                            alt={product.name}
+                                            fill
+                                            className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 z-10 drop-shadow-xl"
+                                        />
+                                    )}
 
                                     {/* Availability Badge (Top Right) */}
                                     <div className="absolute top-5 right-5 z-20">
@@ -300,32 +257,34 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
                                     </div>
 
                                     {/* Specs Grid */}
-                                    <div className="grid grid-cols-2 gap-y-4 gap-x-4 mb-8">
-                                        {product.details.height && (
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Arbeitshöhe</span>
-                                                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.height}</span>
-                                            </div>
-                                        )}
-                                        {product.details.reach && (
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Reichweite</span>
-                                                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.reach}</span>
-                                            </div>
-                                        )}
-                                        {product.details.load && (
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Tragkraft</span>
-                                                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.load}</span>
-                                            </div>
-                                        )}
-                                        {product.details.power && (
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Antrieb</span>
-                                                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.power}</span>
-                                            </div>
-                                        )}
-                                    </div>
+                                    {product.details && (
+                                        <div className="grid grid-cols-2 gap-y-4 gap-x-4 mb-8">
+                                            {product.details.height && (
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Arbeitshöhe</span>
+                                                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.height}</span>
+                                                </div>
+                                            )}
+                                            {product.details.reach && (
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Reichweite</span>
+                                                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.reach}</span>
+                                                </div>
+                                            )}
+                                            {product.details.load && (
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Tragkraft</span>
+                                                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.load}</span>
+                                                </div>
+                                            )}
+                                            {product.details.power && (
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Antrieb</span>
+                                                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.power}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
                                     {/* Footer: Price & Action */}
                                     <div className="mt-auto flex items-center justify-between pt-6 border-t border-zinc-100 dark:border-zinc-900">

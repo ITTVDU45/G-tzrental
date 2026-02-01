@@ -8,6 +8,7 @@ import { CareerSection } from "@/components/about/CareerSection";
 import { AssociationsSection } from "@/components/about/AssociationsSection";
 import { BlogSection } from "@/components/home/BlogSection";
 import { FaqSection } from "@/components/home/FaqSection";
+import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
 
 export default function AboutPage() {
@@ -32,12 +33,15 @@ export default function AboutPage() {
             <AssociationsSection />
 
             {/* 7. Blog Section */}
-            <BlogSection />
+            <BlogSection pageId="page-3" />
 
             {/* 8. FAQ Section */}
             <FaqSection />
 
-            {/* 9. Final CTA */}
+            {/* 9. Testimonials */}
+            <TestimonialsSection pageId="page-3" />
+
+            {/* 10. Final CTA */}
             <FinalCtaSection />
         </div>
     );

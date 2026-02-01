@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { ChevronRight, Filter, ArrowUpDown, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { TestimonialsSection } from "@/components/home/TestimonialsSection";
+import { BlogSection } from "@/components/home/BlogSection";
 
 // Static meta info (could also be dynamic later)
 const pageMeta = {
@@ -111,13 +113,15 @@ export default function AllProductsPage() {
                                 >
                                     <div className="group/card relative h-full w-full rounded-[2rem] shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer">
                                         {/* Background Image */}
-                                        <Image
-                                            src={sub.image}
-                                            alt={sub.name}
-                                            fill
-                                            className="object-contain p-6 transition-transform duration-700 group-hover/card:scale-110"
-                                            sizes="(max-width: 768px) 100vw, 33vw"
-                                        />
+                                        {sub.image && typeof sub.image === 'string' && (
+                                            <Image
+                                                src={sub.image}
+                                                alt={sub.name}
+                                                fill
+                                                className="object-contain p-6 transition-transform duration-700 group-hover/card:scale-110"
+                                                sizes="(max-width: 768px) 100vw, 33vw"
+                                            />
+                                        )}
 
                                         {/* Overlay Gradient */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover/card:opacity-90 transition-opacity duration-300" />
@@ -278,6 +282,11 @@ export default function AllProductsPage() {
                     )}
                 </div>
             </div>
+            {/* Testimonials */}
+            <TestimonialsSection pageId="page-2" />
+
+            {/* Blog Section */}
+            <BlogSection pageId="page-2" />
         </div>
     );
 }

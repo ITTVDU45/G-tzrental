@@ -3,16 +3,6 @@
 import { useEffect, useState } from 'react';
 import DataTable from '@/components/admin/DataTable';
 import Image from 'next/image';
-
-interface Product {
-    id: string;
-    name: string;
-    category: string;
-    subcategory: string;
-    image: string;
-    price: number;
-}
-
 import ProductModal from '@/components/admin/modals/ProductModal';
 
 interface Product {
@@ -22,14 +12,13 @@ interface Product {
     subcategory: string;
     image: string;
     description: string;
+    insuranceText?: string;
+    insuranceBadges?: { id: string; text: string }[];
     price: number;
-    details: {
-        height?: string;
-        reach?: string;
-        load?: string;
-        power?: string;
-        weight?: string;
-    };
+    datasheet?: string;
+    datasheetName?: string;
+    documents?: { id: string; name: string; url: string }[];
+    details: any;
 }
 
 export default function AdminProductsPage() {
@@ -84,7 +73,9 @@ export default function AdminProductsPage() {
             accessor: (item: Product) => (
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 relative bg-zinc-50 dark:bg-zinc-800 rounded-xl overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                        <Image src={item.image} alt={item.name} fill className="object-contain p-1" />
+                        {item.image && typeof item.image === 'string' && (
+                            <Image src={item.image} alt={item.name} fill className="object-contain p-1" />
+                        )}
                     </div>
                     <span className="font-bold text-zinc-900 dark:text-white">{item.name}</span>
                 </div>
