@@ -90,6 +90,7 @@ export default function AdminBlogPage() {
         if (confirm(`Beitrag "${item.title}" wirklich löschen?`)) {
             await fetch('/api/admin/blog', {
                 method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: item.id }),
             });
             fetchPosts();

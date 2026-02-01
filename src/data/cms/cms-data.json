@@ -8,38 +8,40 @@
     ],
     "pages": [
         {
-            "id": "page-1",
-            "title": "Startseite",
-            "slug": "/",
+            "name": "München",
             "status": "published",
-            "lastModified": "2024-01-30",
             "productIds": [
-                "tb-160",
-                "mb-80-e",
-                "s-120-el"
+                "58x41lc13"
             ],
-            "name": "Duesseldorf"
+            "lastModified": "2026-02-01",
+            "id": "page-1769968926407"
         },
         {
-            "id": "page-2",
-            "title": "Mietpark",
-            "slug": "/mieten",
+            "name": "Düsseldorf",
             "status": "published",
-            "lastModified": "2024-01-28"
+            "productIds": [
+                "58x41lc13"
+            ],
+            "lastModified": "2026-02-01",
+            "id": "page-1769969039801"
         },
         {
-            "id": "page-3",
-            "title": "Unternehmen",
-            "slug": "/unternehmen/ueber-uns",
+            "name": "Neuss",
             "status": "published",
-            "lastModified": "2024-01-25"
+            "productIds": [
+                "58x41lc13"
+            ],
+            "lastModified": "2026-02-01",
+            "id": "page-1769969047516"
         },
         {
-            "id": "page-4",
-            "title": "Kontakt",
-            "slug": "/kontakt",
+            "name": "Meerbusch",
             "status": "published",
-            "lastModified": "2024-01-20"
+            "productIds": [
+                "58x41lc13"
+            ],
+            "lastModified": "2026-02-01",
+            "id": "page-1769969058428"
         }
     ],
     "categories": [
@@ -335,6 +337,232 @@
             "rentalEnd": "2024-03-05",
             "status": "confirmed",
             "date": "2024-01-30"
+        }
+    ],
+    "addons": [
+        {
+            "id": "ao-1",
+            "name": "Haftungsbefreiung",
+            "description": "Reduziert den Selbstbehalt im Schadensfall.",
+            "price": 15,
+            "priceType": "daily",
+            "categoryIds": []
+        },
+        {
+            "id": "ao-2",
+            "name": "Bedienerschulung",
+            "description": "Einweisung durch zertifiziertes Personal.",
+            "price": 99,
+            "priceType": "one-time",
+            "categoryIds": []
+        },
+        {
+            "id": "ao-3",
+            "name": "Sicherheitsgurt PSA",
+            "description": "Pflicht für Hubarbeitsbühnen.",
+            "price": 0,
+            "priceType": "one-time",
+            "categoryIds": [
+                "cat-platforms"
+            ]
+        },
+        {
+            "id": "ao-4",
+            "name": "Extra Schlüssel",
+            "description": "Zweitschlüssel für das Mietgerät.",
+            "price": 5,
+            "priceType": "one-time",
+            "categoryIds": []
+        },
+        {
+            "priceType": "one-time",
+            "price": 100,
+            "name": "TEST",
+            "description": "test",
+            "image": "/uploads/1769974640896-bediener.png",
+            "categoryIds": [
+                "cat-1",
+                "cat-2",
+                "cat-3",
+                "cat-4",
+                "cat-5",
+                "cat-6",
+                "cat-1769885713594"
+            ],
+            "productIds": [
+                "58x41lc13"
+            ],
+            "id": "ao-1769974655289"
+        }
+    ],
+    "configuratorExtras": [
+        "ao-2",
+        "ao-1",
+        "ao-1769974655289"
+    ],
+    "configuratorUpselling": [
+        "58x41lc13",
+        "gs-25",
+        "mb-80-e",
+        "tb-160",
+        "s-120-el",
+        "rt-40",
+        "mb-100",
+        "exc-50"
+    ],
+    "configuratorCategories": [
+        "cat-1",
+        "cat-2",
+        "cat-3",
+        "cat-4",
+        "cat-5",
+        "cat-6"
+    ],
+    "configuratorFilters": [
+        {
+            "id": "f-height",
+            "type": "slider",
+            "key": "height",
+            "label": "Arbeitshöhe",
+            "unit": "m",
+            "min": 0,
+            "max": 60,
+            "step": 1,
+            "defaultValue": 12
+        },
+        {
+            "id": "f-reach",
+            "type": "slider",
+            "key": "reach",
+            "label": "Reichweite",
+            "unit": "m",
+            "min": 0,
+            "max": 30,
+            "step": 1,
+            "defaultValue": 8
+        },
+        {
+            "id": "f-load",
+            "type": "slider",
+            "key": "load",
+            "label": "Korblast",
+            "unit": "kg",
+            "min": 0,
+            "max": 1000,
+            "step": 50,
+            "defaultValue": 200
+        },
+        {
+            "id": "f-drive",
+            "type": "select",
+            "key": "drive",
+            "label": "Antriebsart",
+            "options": [
+                {
+                    "value": "e",
+                    "label": "Elektro (Innen)"
+                },
+                {
+                    "value": "d",
+                    "label": "Diesel (Außen)"
+                },
+                {
+                    "value": "h",
+                    "label": "Hybrid"
+                }
+            ]
+        },
+        {
+            "id": "f-ground",
+            "type": "select",
+            "key": "ground",
+            "label": "Untergrund",
+            "options": [
+                {
+                    "value": "flat",
+                    "label": "Eben / Fest"
+                },
+                {
+                    "value": "rough",
+                    "label": "Gelände / Uneben"
+                }
+            ]
+        },
+        {
+            "id": "f-env",
+            "type": "select",
+            "key": "environment",
+            "label": "Einsatzort",
+            "options": [
+                {
+                    "value": "indoor",
+                    "label": "Innen"
+                },
+                {
+                    "value": "outdoor",
+                    "label": "Außen"
+                }
+            ]
+        },
+        {
+            "id": "f-1769976670164",
+            "type": "select",
+            "key": "TEST1",
+            "label": "TEST",
+            "options": [
+                {
+                    "label": "Option 1",
+                    "value": "opt1"
+                },
+                {
+                    "label": "Option 2",
+                    "value": "opt2"
+                },
+                {
+                    "label": "Option 3",
+                    "value": "opt3"
+                }
+            ]
+        },
+        {
+            "id": "f-1769977342252",
+            "type": "radio",
+            "key": "Test2",
+            "label": "TEST 2",
+            "options": [
+                {
+                    "label": "Option 1",
+                    "value": "opt1"
+                },
+                {
+                    "label": "Option 2",
+                    "value": "opt2"
+                },
+                {
+                    "label": "Option 3",
+                    "value": "opt3 "
+                }
+            ]
+        },
+        {
+            "id": "f-1769977427328",
+            "type": "checkbox",
+            "key": "Test3",
+            "label": "TEST3",
+            "options": [
+                {
+                    "label": "Option 1",
+                    "value": "opt1"
+                },
+                {
+                    "label": "Option2",
+                    "value": "opt2"
+                },
+                {
+                    "label": "Option3",
+                    "value": "opt3"
+                }
+            ]
         }
     ]
 }

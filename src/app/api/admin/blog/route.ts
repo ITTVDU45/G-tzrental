@@ -3,10 +3,8 @@ import { readDb, writeDb } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
 export async function GET() {
-    const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
 
     // Seed if empty
     if (!db.blog || db.blog.length === 0) {
@@ -44,6 +42,7 @@ export async function POST(req: NextRequest) {
 
     const post = await req.json();
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
 
     if (post.id) {
         const idx = db.blog.findIndex((p: any) => p.id === post.id);
@@ -64,6 +63,8 @@ export async function DELETE(req: NextRequest) {
 
     const { id } = await req.json();
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
+
     db.blog = db.blog.filter((p: any) => p.id !== id);
     await writeDb(db);
     return NextResponse.json({ success: true });

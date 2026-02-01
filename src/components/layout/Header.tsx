@@ -250,17 +250,30 @@ export function Header() {
             try {
                 const res = await fetch('/api/admin/pages');
                 const data = await res.json();
+                if (!Array.isArray(data)) {
+                    setLocations([]);
+                    return;
+                }
+                const excludedSlugs = ['/', '/mieten', '/kontakt', '/unternehmen/ueber-uns'];
                 const publishedLocations = data
-                    .filter((loc: any) => loc.status === 'published')
-                    .map((loc: any) => ({
-                        name: loc.name,
-                        slug: loc.name.toLowerCase()
-                            .replace(/\s+/g, '-')
-                            .replace(/ä/g, 'ae')
-                            .replace(/ö/g, 'oe')
-                            .replace(/ü/g, 'ue')
-                            .replace(/ß/g, 'ss')
-                    }));
+                    .filter((loc: any) =>
+                        loc &&
+                        loc.status === 'published' &&
+                        loc.name &&
+                        !excludedSlugs.includes(loc.slug)
+                    )
+                    .map((loc: any) => {
+                        const name = loc.name;
+                        return {
+                            name: name,
+                            slug: name.toLowerCase()
+                                .replace(/\s+/g, '-')
+                                .replace(/ä/g, 'ae')
+                                .replace(/ö/g, 'oe')
+                                .replace(/ü/g, 'ue')
+                                .replace(/ß/g, 'ss')
+                        };
+                    });
                 setLocations(publishedLocations);
             } catch (err) {
                 console.error('Error fetching locations:', err);

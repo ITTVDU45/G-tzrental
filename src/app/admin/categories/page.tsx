@@ -44,6 +44,7 @@ export default function AdminCategoriesPage() {
         try {
             const res = await fetch('/api/admin/categories', {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
             if (res.ok) {
@@ -82,6 +83,7 @@ export default function AdminCategoriesPage() {
         if (confirm(`Kategorie "${item.name}" wirklich löschen?`)) {
             await fetch('/api/admin/categories', {
                 method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: item.id }),
             });
             fetchCategories();

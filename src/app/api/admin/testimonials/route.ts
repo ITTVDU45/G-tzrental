@@ -3,11 +3,8 @@ import { readDb, writeDb } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 
 export async function GET() {
-    // Public endpoint for testimonials
-    // const session = await getSession();
-    // if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
 
     // Seed if empty
     if (!db.testimonials || db.testimonials.length === 0) {
@@ -58,6 +55,7 @@ export async function POST(req: NextRequest) {
 
     const testimonial = await req.json();
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
 
     if (testimonial.id) {
         const idx = db.testimonials.findIndex((t: any) => t.id === testimonial.id);
@@ -78,6 +76,8 @@ export async function DELETE(req: NextRequest) {
 
     const { id } = await req.json();
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
+
     db.testimonials = db.testimonials.filter((t: any) => t.id !== id);
     await writeDb(db);
     return NextResponse.json({ success: true });

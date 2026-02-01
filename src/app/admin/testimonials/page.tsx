@@ -83,6 +83,7 @@ export default function AdminTestimonialsPage() {
         if (confirm(`Testimonial von "${item.name}" wirklich löschen?`)) {
             await fetch('/api/admin/testimonials', {
                 method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: item.id }),
             });
             fetchTestimonials();

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Phone, Mail, MapPin, Clock, Truck, Shield, GraduationCap, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 import { BlogSection } from "@/components/home/BlogSection";
 import { FaqSection } from "@/components/home/FaqSection";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
@@ -395,12 +396,18 @@ export default function DuesseldorfPage() {
                                             {product.badge}
                                         </div>
                                     )}
-                                    <Image
-                                        src={product.image}
-                                        alt={product.name}
-                                        fill
-                                        className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                    />
+                                    {product.image ? (
+                                        <Image
+                                            src={product.image}
+                                            alt={product.name}
+                                            fill
+                                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                                            <span className="text-zinc-400 text-xs font-bold uppercase tracking-widest">Kein Bild</span>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="p-6">
                                     <div className="flex items-center justify-between mb-4">

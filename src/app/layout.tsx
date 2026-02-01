@@ -17,13 +17,19 @@ export const metadata: Metadata = {
   title: "Goetzrental | Modern Rental Platform",
   description: "Next generation technical rental solution.",
   manifest: "/manifest.json",
-  themeColor: "#008080",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Goetz Admin",
   },
+};
+
+export const viewport = {
+  themeColor: "#008080",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

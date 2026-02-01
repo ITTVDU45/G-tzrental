@@ -88,6 +88,7 @@ export default function AdminLocationsPage() {
         if (confirm(`Standort "${item.name}" wirklich löschen?`)) {
             await fetch('/api/admin/pages', {
                 method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: item.id }),
             });
             fetchLocations();

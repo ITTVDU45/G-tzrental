@@ -171,13 +171,19 @@ export function ProductSelector({ isOpen, onClose, onSelect }: ProductSelectorPr
                                             >
                                                 {/* Image */}
                                                 <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
-                                                    <Image
-                                                        src={product.image}
-                                                        alt={product.name}
-                                                        fill
-                                                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                    />
+                                                    {product.image ? (
+                                                        <Image
+                                                            src={product.image}
+                                                            alt={product.name}
+                                                            fill
+                                                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-zinc-100 flex items-center justify-center">
+                                                            <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Kein Bild</span>
+                                                        </div>
+                                                    )}
                                                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold text-brand-teal shadow-sm">
                                                         {product.category}
                                                     </div>

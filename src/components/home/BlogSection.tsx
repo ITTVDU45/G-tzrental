@@ -18,9 +18,14 @@ export function BlogSection({ pageId }: BlogSectionProps) {
                 const res = await fetch('/api/admin/blog');
                 const data = await res.json();
 
+                if (!Array.isArray(data)) {
+                    setPosts([]);
+                    return;
+                }
+
                 // Filter by status and pageId
                 const filtered = data
-                    .filter((p: any) => p.status === 'published')
+                    .filter((p: any) => p && p.status === 'published')
                     .filter((p: any) => !pageId || !p.pageIds || p.pageIds.length === 0 || p.pageIds.includes(pageId));
 
                 setPosts(filtered.slice(0, 3));

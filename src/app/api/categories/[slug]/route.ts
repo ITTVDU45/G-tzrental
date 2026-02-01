@@ -47,7 +47,7 @@ export async function GET(
         }
     }
 
-    let resultProducts = [];
+    let resultProducts: any[] = [];
     let meta = {
         title: '',
         description: '',

@@ -26,7 +26,11 @@ export function CategorySlider() {
             try {
                 const res = await fetch('/api/admin/categories');
                 const data = await res.json();
-                setCategories(data);
+                if (Array.isArray(data)) {
+                    setCategories(data);
+                } else {
+                    setCategories([]);
+                }
             } catch (err) {
                 console.error(err);
             } finally {
@@ -103,35 +107,38 @@ export function CategorySlider() {
                     className="flex gap-6 overflow-x-auto pb-4 snap-x scrollbar-none"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }} // Hide scrollbar for Firefox and IE
                 >
-                    {categories.map((cat, index) => (
-                        <motion.div
-                            key={cat.name}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
-                            className="min-w-[200px] md:min-w-[240px] snap-center group"
-                        >
-                            <Link href={cat.link || `/mieten/${cat.name.toLowerCase()}`} className="block h-full cursor-pointer">
-                                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
-                                    {cat.image && typeof cat.image === 'string' && (
-                                        <Image
-                                            src={cat.image}
-                                            alt={cat.name}
-                                            fill
-                                            className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                        />
-                                    )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                </div>
-                                <div className="pt-4 text-center">
-                                    <h3 className="font-semibold text-lg text-foreground group-hover:text-brand-teal transition-colors">{cat.name}</h3>
-                                    <p className="text-sm text-foreground/60">{cat.count} Modelle</p>
-                                </div>
-                            </Link>
-                        </motion.div>
-                    ))}
+                    {categories.map((cat, index) => {
+                        if (!cat || !cat.name) return null;
+                        return (
+                            <motion.div
+                                key={cat.name}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1 }}
+                                className="min-w-[200px] md:min-w-[240px] snap-center group"
+                            >
+                                <Link href={cat.link || `/mieten/${cat.name.toLowerCase()}`} className="block h-full cursor-pointer">
+                                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:-translate-y-1">
+                                        {cat.image && typeof cat.image === 'string' && (
+                                            <Image
+                                                src={cat.image}
+                                                alt={cat.name}
+                                                fill
+                                                className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            />
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    </div>
+                                    <div className="pt-4 text-center">
+                                        <h3 className="font-semibold text-lg text-foreground group-hover:text-brand-teal transition-colors">{cat.name}</h3>
+                                        <p className="text-sm text-foreground/60">{cat.count} Modelle</p>
+                                    </div>
+                                </Link>
+                            </motion.div>
+                        );
+                    })}
                 </div>
             </div>
         </section>

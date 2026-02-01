@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 
 export async function GET() {
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
 
     // Seed if empty
     if (!db.pages || db.pages.length === 0) {
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
 
     const page = await req.json();
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
 
     if (page.id) {
         const idx = db.pages.findIndex((p: any) => p.id === page.id);
@@ -45,6 +47,8 @@ export async function DELETE(req: NextRequest) {
 
     const { id } = await req.json();
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
+
     db.pages = db.pages.filter((p: any) => p.id !== id);
     await writeDb(db);
     return NextResponse.json({ success: true });

@@ -56,6 +56,7 @@ export default function AdminProductsPage() {
         try {
             const res = await fetch('/api/admin/products', {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
             if (res.ok) {
@@ -95,6 +96,7 @@ export default function AdminProductsPage() {
         if (confirm(`Möchten Sie "${item.name}" wirklich löschen?`)) {
             await fetch('/api/admin/products', {
                 method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: item.id }),
             });
             fetchData();

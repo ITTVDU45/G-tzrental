@@ -1,20 +1,20 @@
 "use client";
 
+import ConfiguratorShell from "@/components/configurator/core/ConfiguratorShell";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Phone, Mail, MapPin, Clock, Truck, Shield, GraduationCap, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 interface Product {
     id: string;
     name: string;
     image: string;
-    price: string;
-    workingHeight: string;
-    sideReach: string;
-    maxLoad: string;
-    type: string;
+    price: string | number;
+    subcategory: string;
+    details: any;
     badge?: string;
 }
 
@@ -55,13 +55,6 @@ export default function LocationPage() {
     const [location, setLocation] = useState<Location | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: ""
-    });
 
     useEffect(() => {
         const fetchLocationData = async () => {
@@ -100,11 +93,7 @@ export default function LocationPage() {
         fetchLocationData();
     }, [slug]);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log("Form submitted:", formData);
-        // Handle form submission
-    };
+
 
     if (loading) {
         return (
@@ -133,94 +122,61 @@ export default function LocationPage() {
             {/* Hero Section */}
             <section className="pt-32 pb-12 bg-white dark:bg-zinc-950">
                 <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-                        {/* Left: Content */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="space-y-8"
-                        >
-                            <div>
-                                <p className="text-sm font-bold text-brand-teal uppercase tracking-wider mb-4">
-                                    Arbeitsbühnen am Standort {location.name}
-                                </p>
-                                <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-6 leading-tight">
-                                    Du möchtest eine Arbeitsbühne in <span className="text-brand-teal">{location.name} mieten?</span>
-                                </h1>
-                                <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    Bei GÖTZ RENTAL in {location.name} mietest du flexibel und jederzeit verfügbare Modelle: ob für Bauvorhaben, Wartungsarbeiten oder Events – bei uns stehen dir verschiedene moderne und leistungsstarke Arbeitsbühnen zur Auswahl. Von Scheren- über Teleskop- bis hin zu Gelenkteleskopbühnen.
-                                </p>
-                            </div>
+                    <div className="flex flex-col lg:flex-row items-center gap-12 mb-16">
+                        {/* Left: Text Content */}
+                        <div className="flex-1 text-center lg:text-left">
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-sm font-bold text-brand-teal uppercase tracking-wider mb-4"
+                            >
+                                Arbeitsbühnen am Standort {location.name}
+                            </motion.p>
+                            <motion.h1
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                                className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-6 leading-[1.1]"
+                            >
+                                Du möchtest eine Arbeitsbühne in <span className="text-brand-teal">{location.name} mieten?</span>
+                            </motion.h1>
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-2xl mx-auto lg:mx-0"
+                            >
+                                Bei GÖTZ RENTAL in {location.name} mietest du flexibel und jederzeit verfügbare Modelle: ob für Bauvorhaben, Wartungsarbeiten oder Events.
+                            </motion.p>
+                        </div>
 
-                            {/* Contact Form */}
-                            <div className="bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-8 border border-zinc-200 dark:border-zinc-800">
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <input
-                                            type="text"
-                                            placeholder="Name"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            className="px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
-                                        />
-                                        <input
-                                            type="email"
-                                            placeholder="E-Mail"
-                                            value={formData.email}
-                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            className="px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <input
-                                            type="tel"
-                                            placeholder="Deine Telefonnummer"
-                                            value={formData.phone}
-                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            className="px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="Thema"
-                                            value={formData.subject}
-                                            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                            className="px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
-                                        />
-                                    </div>
-                                    <textarea
-                                        placeholder="Nachricht"
-                                        rows={4}
-                                        value={formData.message}
-                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-teal resize-none"
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-brand-teal text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-teal/90 transition-colors"
-                                    >
-                                        Absenden
-                                    </button>
-                                    <p className="text-xs text-zinc-500 text-center">
-                                        Diese Website ist durch hCaptcha geschützt und es gelten die allgemeinen Geschäftsbedingungen und Datenschutzbestimmungen von hCaptcha.
-                                    </p>
-                                </form>
-                            </div>
-                        </motion.div>
-
-                        {/* Right: Image */}
+                        {/* Right: Hero Image */}
                         <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.2 }}
-                            className="relative h-[600px] rounded-[2rem] overflow-hidden shadow-2xl"
+                            className="flex-1 w-full"
                         >
-                            <Image
-                                src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000"
-                                alt={`Götz Rental ${location.name} Standort`}
-                                fill
-                                className="object-cover"
-                            />
+                            <div className="relative w-full h-[300px] md:h-[400px] rounded-[2.5rem] overflow-hidden shadow-2xl">
+                                <Image
+                                    src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=2000"
+                                    alt={`Götz Rental ${location.name}`}
+                                    fill
+                                    className="object-cover hover:scale-105 transition-transform duration-700"
+                                    priority
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                <div className="absolute bottom-0 left-0 p-8 text-white">
+                                    <p className="text-xs font-bold uppercase tracking-wider mb-2 text-brand-teal">Mietpark {location.name}</p>
+                                    <h3 className="text-xl md:text-2xl font-bold">Premium Geräte verfügbar.</h3>
+                                </div>
+                            </div>
                         </motion.div>
+                    </div>
+
+                    {/* Configurator Embed */}
+                    <div className="w-full relative z-10">
+                        <ConfiguratorShell locationSlug={slug} />
                     </div>
                 </div>
             </section>
@@ -270,45 +226,92 @@ export default function LocationPage() {
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true }}
                                         transition={{ delay: index * 0.1 }}
-                                        className="group bg-white dark:bg-zinc-900 rounded-[2rem] overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:shadow-2xl transition-all duration-300"
+                                        className="group relative bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] dark:from-zinc-800 dark:to-zinc-900 rounded-[2.5rem] overflow-hidden hover:shadow-2xl transition-all duration-500 border border-zinc-100 dark:border-zinc-800 flex flex-col"
                                     >
-                                        <div className="relative h-64 overflow-hidden">
-                                            {product.badge && (
-                                                <div className="absolute top-4 right-4 z-10 px-3 py-1 rounded-full bg-brand-teal text-white text-xs font-bold">
-                                                    {product.badge}
+                                        {/* Top: Image Area */}
+                                        <div className="relative h-[260px] p-6 flex items-center justify-center overflow-hidden">
+                                            {/* Decorative circle blur for depth */}
+                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/40 dark:bg-white/5 rounded-full blur-3xl" />
+
+                                            {product.image ? (
+                                                <Image
+                                                    src={product.image}
+                                                    alt={product.name}
+                                                    fill
+                                                    className="object-contain p-4 group-hover:scale-110 transition-transform duration-500 z-10 drop-shadow-xl"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-zinc-100/50 dark:bg-zinc-800/50 flex items-center justify-center">
+                                                    <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Kein Bild verfügbar</span>
                                                 </div>
                                             )}
-                                            <Image
-                                                src={product.image}
-                                                alt={product.name}
-                                                fill
-                                                className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                            />
-                                        </div>
-                                        <div className="p-6">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white">{product.name}</h3>
-                                                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                            </div>
-                                            <div className="text-brand-teal font-bold text-2xl mb-4">
-                                                ab {product.price} € /Tag
-                                                <span className="text-xs text-zinc-500 ml-1">zzgl. MwSt.</span>
-                                            </div>
-                                            <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
-                                                <div className="flex justify-between">
-                                                    <span>{product.workingHeight}</span>
-                                                    <span className="text-zinc-400">Arbeitshöhe</span>
+
+                                            {/* Availability Badge (Top Right) */}
+                                            <div className="absolute top-5 right-5 z-20">
+                                                <div className="flex items-center gap-2 bg-white/60 dark:bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-white/50 dark:border-white/10">
+                                                    <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse"></div>
+                                                    <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-700 dark:text-zinc-200">Verfügbar</span>
                                                 </div>
-                                                {product.sideReach !== "-" && (
-                                                    <div className="flex justify-between">
-                                                        <span>{product.sideReach}</span>
-                                                        <span className="text-zinc-400">seitl. Reichweite</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Bottom: Content Area */}
+                                        <div className="p-6 flex flex-col flex-1 bg-white dark:bg-zinc-950 rounded-t-[2.5rem] relative z-20 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
+                                            {/* Title & Category */}
+                                            <div className="mb-6">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className="text-[10px] uppercase tracking-wider font-bold text-brand-teal">
+                                                        {product.subcategory}
+                                                    </span>
+                                                </div>
+                                                <h3 className="text-xl font-bold text-brand-dark dark:text-white leading-tight group-hover:text-brand-teal transition-colors">
+                                                    {product.name}
+                                                </h3>
+                                            </div>
+
+                                            {/* Specs Grid */}
+                                            <div className="grid grid-cols-2 gap-y-4 gap-x-4 mb-8">
+                                                {product.details?.height && (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Arbeitshöhe</span>
+                                                        <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.height}</span>
                                                     </div>
                                                 )}
-                                                <div className="flex justify-between">
-                                                    <span>{product.maxLoad}</span>
-                                                    <span className="text-zinc-400">max. Korblast</span>
+                                                {product.details?.reach && (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Reichweite</span>
+                                                        <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.reach}</span>
+                                                    </div>
+                                                )}
+                                                {product.details?.load && (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Tragkraft</span>
+                                                        <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.load}</span>
+                                                    </div>
+                                                )}
+                                                {product.details?.power && (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Antrieb</span>
+                                                        <span className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-0.5">{product.details.power}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Footer: Price & Action */}
+                                            <div className="mt-auto flex items-center justify-between pt-6 border-t border-zinc-100 dark:border-zinc-900">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] text-zinc-400 uppercase font-bold">Tagesmiete</span>
+                                                    <div className="flex items-baseline gap-0.5">
+                                                        <span className="text-2xl font-bold text-brand-dark dark:text-white">{product.price}€</span>
+                                                        <span className="text-xs text-zinc-400 font-medium">/Tag</span>
+                                                    </div>
                                                 </div>
+
+                                                <Link href={`/mieten/geraet/${product.id}`}>
+                                                    <button className="bg-brand-dark dark:bg-white text-white dark:text-brand-dark px-6 py-3 rounded-2xl font-bold text-sm hover:bg-brand-teal dark:hover:bg-brand-teal dark:hover:text-white transition-all duration-300 shadow-xl shadow-brand-dark/10 hover:shadow-brand-teal/20 transform hover:-translate-y-1">
+                                                        Mieten
+                                                    </button>
+                                                </Link>
                                             </div>
                                         </div>
                                     </motion.div>

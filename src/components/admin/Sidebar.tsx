@@ -16,7 +16,8 @@ import {
     Menu,
     X,
     Image as ImageIcon,
-    MapPin
+    MapPin,
+    Tag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,7 +29,9 @@ const menuItems = [
     { title: 'Standorte', icon: MapPin, href: '/admin/pages' },
     { title: 'Kategorien', icon: Layers, href: '/admin/categories' },
     { title: 'Produkte', icon: Box, href: '/admin/products' },
+    { title: 'Zusatzleistungen', icon: Tag, href: '/admin/addons' },
     { title: 'Testimonials', icon: MessageSquare, href: '/admin/testimonials' },
+    { title: 'Konfigurator', icon: Layers, href: '/admin/configurator' },
     { title: 'Blog & Ratgeber', icon: BookOpen, href: '/admin/blog' },
 ];
 

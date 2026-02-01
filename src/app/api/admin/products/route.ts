@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 
 export async function GET() {
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
 
     // Seed if empty
     if (!db.products || db.products.length === 0) {
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
 
     const product = await req.json();
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
 
     if (product.id) {
         // Update
@@ -46,6 +48,8 @@ export async function DELETE(req: NextRequest) {
 
     const { id } = await req.json();
     const db = await readDb();
+    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
+
     db.products = db.products.filter((p: any) => p.id !== id);
     await writeDb(db);
     return NextResponse.json({ success: true });
