@@ -8,34 +8,14 @@ export async function GET() {
 
     const db = await readDb();
 
-    // Seed if empty
-    if (!db.inquiries || db.inquiries.length === 0) {
-        db.inquiries = [
-            {
-                id: 'inq-1',
-                customerName: 'Max Mustermann',
-                customerEmail: 'max@example.com',
-                productName: 'MB 80-E',
-                rentalStart: '2024-02-15',
-                rentalEnd: '2024-02-20',
-                status: 'pending',
-                date: '2024-01-31'
-            },
-            {
-                id: 'inq-2',
-                customerName: 'Bau GmbH Köln',
-                customerEmail: 'info@bau-koeln.de',
-                productName: 'Teleskopbühne T 160',
-                rentalStart: '2024-03-01',
-                rentalEnd: '2024-03-05',
-                status: 'confirmed',
-                date: '2024-01-30'
-            }
-        ];
+    // Initialize if empty
+    if (!db.inquiries) {
+        db.inquiries = [];
         await writeDb(db);
     }
 
-    return NextResponse.json(db.inquiries || []);
+    // Return all inquiries with full details
+    return NextResponse.json(db.inquiries);
 }
 
 export async function POST(req: NextRequest) {

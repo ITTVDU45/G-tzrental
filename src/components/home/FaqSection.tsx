@@ -48,7 +48,19 @@ const faqs = [
     }
 ];
 
-export function FaqSection() {
+interface FaqItem {
+    question: string;
+    answer: string;
+}
+
+interface FaqSectionProps {
+    items?: FaqItem[];
+    title?: string;
+    subtitle?: string;
+}
+
+export function FaqSection({ items, title, subtitle }: FaqSectionProps) {
+    const displayFaqs = items || faqs;
     const [openIndex, setOpenIndex] = useState<number | null>(null);
 
     const toggleFaq = (index: number) => {
@@ -61,17 +73,16 @@ export function FaqSection() {
                 {/* Header */}
                 <div className="max-w-3xl mx-auto text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold text-brand-dark dark:text-white mb-6">
-                        Häufig gestellte Fragen
+                        {title || "Häufig gestellte Fragen"}
                     </h2>
                     <p className="text-zinc-500 text-lg">
-                        Hier finden Sie Antworten auf die wichtigsten Fragen rund um unsere Vermietung.
-                        Haben Sie weitere Fragen? Kontaktieren Sie uns gerne!
+                        {subtitle || "Hier finden Sie Antworten auf die wichtigsten Fragen rund um unsere Vermietung. Haben Sie weitere Fragen? Kontaktieren Sie uns gerne!"}
                     </p>
                 </div>
 
                 {/* FAQ List */}
                 <div className="max-w-4xl mx-auto space-y-4 mb-12">
-                    {faqs.map((faq, index) => (
+                    {displayFaqs.map((faq, index) => (
                         <div
                             key={index}
                             className="border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden bg-zinc-50 dark:bg-zinc-900/50 hover:border-brand-teal/50 transition-colors duration-300"

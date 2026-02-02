@@ -17,7 +17,7 @@ export default function Step3DeviceType() {
     // Using filtered device types from API recommendation
     const recommendedDeviceTypeIds = recommendations.suitableDeviceTypes.map(d => d.id);
     const availableDeviceTypes = config.deviceTypes.filter(dt =>
-        dt.categoryId === state.categoryId && recommendedDeviceTypeIds.includes(dt.id)
+        recommendedDeviceTypeIds.includes(dt.id)
     );
 
     // If recommendation returns none, maybe show all for category? Logic depends on strictness.
@@ -59,12 +59,27 @@ export default function Step3DeviceType() {
         <div className="space-y-10">
             <div className="text-center max-w-2xl mx-auto">
                 <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-4">
-                    Gefundene Lösungen
+                    {recommendations.hasMatches ? "Gefundene Lösungen" : "Alternative Empfehlungen"}
                 </h2>
                 <p className="text-zinc-500 dark:text-zinc-400">
-                    Wir haben {recommendations.products.length} passende Geräte für deine Anforderungen gefunden.
+                    {recommendations.hasMatches
+                        ? `Wir haben ${recommendations.products.length} passende Geräte für deine Anforderungen gefunden.`
+                        : `Für deine spezifischen Anforderungen haben wir aktuell keine exakten Treffer. Hier sind unsere besten Alternativen:`}
                 </p>
             </div>
+
+            {!recommendations.hasMatches && (
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 p-6 rounded-2xl flex gap-4 items-start max-w-3xl mx-auto">
+                    <Info className="w-6 h-6 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                        <p className="font-bold text-amber-900 dark:text-amber-200">Keine exakten Treffer gefunden</p>
+                        <p className="text-sm text-amber-800/80 dark:text-amber-300/70">
+                            Wir haben deine Anforderungen (Höhe, Reichweite, Last) geprüft, aber aktuell kein Gerät im Bestand, das alle Kriterien exakt erfüllt.
+                            Wir schlagen dir stattdessen unsere meistgenutzten Modelle vor. Du kannst trotzdem fortfahren – unser Team meldet sich mit einer individuellen Lösung.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* 1. Device Types Selection */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

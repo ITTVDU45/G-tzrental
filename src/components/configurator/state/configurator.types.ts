@@ -77,6 +77,7 @@ export interface ConfiguratorData {
 export interface RecommendationResult {
     suitableDeviceTypes: { id: string; label: string }[];
     products: Product[];
+    hasMatches: boolean;
 }
 
 // State Types

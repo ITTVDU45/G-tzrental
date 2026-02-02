@@ -29,6 +29,7 @@ import {
     ChevronLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ProductInquiryModal from "./ProductInquiryModal";
 
 interface ProductTemplateProps {
     product: any;
@@ -37,6 +38,7 @@ interface ProductTemplateProps {
 
 export default function ProductTemplate({ product, alternatives }: ProductTemplateProps) {
     const [activeAccordion, setActiveAccordion] = useState<string | null>("description");
+    const [showInquiryModal, setShowInquiryModal] = useState(false);
 
     return (
         <div className="min-h-screen bg-white dark:bg-zinc-950 pt-32 pb-24">
@@ -191,7 +193,10 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                                     </div>
                                 </div>
 
-                                <button className="w-full py-5 bg-brand-teal hover:bg-brand-teal/90 text-white rounded-[1.5rem] font-black text-lg shadow-xl shadow-brand-teal/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                                <button
+                                    onClick={() => setShowInquiryModal(true)}
+                                    className="w-full py-5 bg-brand-teal hover:bg-brand-teal/90 text-white rounded-[1.5rem] font-black text-lg shadow-xl shadow-brand-teal/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                >
                                     Mietzeitraum wählen
                                 </button>
 
@@ -432,11 +437,21 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                             <p className="text-brand-teal font-black">ab {product.price}€ <span className="text-xs text-zinc-400 font-bold">/ TAG</span></p>
                         </div>
                     </div>
-                    <button className="px-8 py-4 bg-brand-dark dark:bg-brand-teal text-white rounded-[1.25rem] font-bold text-sm shadow-xl hover:scale-105 active:scale-95 transition-all">
+                    <button
+                        onClick={() => setShowInquiryModal(true)}
+                        className="px-8 py-4 bg-brand-dark dark:bg-brand-teal text-white rounded-[1.25rem] font-bold text-sm shadow-xl hover:scale-105 active:scale-95 transition-all"
+                    >
                         Mietzeitraum wählen
                     </button>
                 </div>
             </motion.div>
+
+            {/* Inquiry Modal */}
+            <ProductInquiryModal
+                isOpen={showInquiryModal}
+                onClose={() => setShowInquiryModal(false)}
+                product={product}
+            />
         </div>
     );
 }

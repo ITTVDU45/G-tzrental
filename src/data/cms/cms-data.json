@@ -11,7 +11,14 @@
             "name": "München",
             "status": "published",
             "productIds": [
-                "58x41lc13"
+                "58x41lc13",
+                "mb-80-e",
+                "tb-160",
+                "s-120-el",
+                "gs-25",
+                "rt-40",
+                "mb-100",
+                "exc-50"
             ],
             "lastModified": "2026-02-01",
             "id": "page-1769968926407"
@@ -325,7 +332,7 @@
             "productName": "MB 80-E",
             "rentalStart": "2024-02-15",
             "rentalEnd": "2024-02-20",
-            "status": "cancelled",
+            "status": "canceled",
             "date": "2024-01-31"
         },
         {
@@ -346,7 +353,15 @@
             "description": "Reduziert den Selbstbehalt im Schadensfall.",
             "price": 15,
             "priceType": "daily",
-            "categoryIds": []
+            "categoryIds": [
+                "cat-1",
+                "cat-2",
+                "cat-3",
+                "cat-4",
+                "cat-5",
+                "cat-6",
+                "cat-1769885713594"
+            ]
         },
         {
             "id": "ao-2",
@@ -354,7 +369,15 @@
             "description": "Einweisung durch zertifiziertes Personal.",
             "price": 99,
             "priceType": "one-time",
-            "categoryIds": []
+            "categoryIds": [
+                "cat-1",
+                "cat-2",
+                "cat-3",
+                "cat-4",
+                "cat-5",
+                "cat-6",
+                "cat-1769885713594"
+            ]
         },
         {
             "id": "ao-3",
@@ -372,7 +395,15 @@
             "description": "Zweitschlüssel für das Mietgerät.",
             "price": 5,
             "priceType": "one-time",
-            "categoryIds": []
+            "categoryIds": [
+                "cat-1",
+                "cat-2",
+                "cat-3",
+                "cat-4",
+                "cat-5",
+                "cat-6",
+                "cat-1769885713594"
+            ]
         },
         {
             "priceType": "one-time",
@@ -398,7 +429,9 @@
     "configuratorExtras": [
         "ao-2",
         "ao-1",
-        "ao-1769974655289"
+        "ao-1769974655289",
+        "ao-3",
+        "ao-4"
     ],
     "configuratorUpselling": [
         "58x41lc13",

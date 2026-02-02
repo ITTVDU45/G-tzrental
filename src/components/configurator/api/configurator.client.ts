@@ -1,14 +1,14 @@
-import { ConfiguratorData, RecommendationResult } from "../state/configurator.types";
+import { ConfiguratorData, RecommendationResult, Product } from "../state/configurator.types";
 
 // Keep static fallback/defaults for things not yet dynamic
 const STATIC_DEFAULTS = {
     location: { id: "loc-1", slug: "duesseldorf", name: "Düsseldorf" },
     deviceTypes: [
-        { id: "dt-1", categoryId: "cat-2", label: "Scherenbühne", iconKey: "scissor", description: "Ideal für senkrechte Arbeiten im Innenbereich." },
-        { id: "dt-2", categoryId: "cat-3", label: "Gelenkteleskop", iconKey: "boom", description: "Perfekt für schwer zugängliche Stellen." },
-        { id: "dt-1", categoryId: "cat-1", label: "Teleskopbühne", iconKey: "boom", description: "Für maximale Höhe und Reichweite." },
-        { id: "dt-1", categoryId: "cat-4", label: "Mastbühne", iconKey: "scissor", description: "Kompakt für enge Gänge." },
-        { id: "dt-3", categoryId: "cat-5", label: "Frontstapler", iconKey: "forklift", description: "Klassiker für den Palettentransport." },
+        { id: "Schere", categoryId: "cat-2", label: "Scherenbühne", iconKey: "scissor", description: "Ideal für senkrechte Arbeiten im Innenbereich." },
+        { id: "Gelenk", categoryId: "cat-3", label: "Gelenkteleskop", iconKey: "boom", description: "Perfekt für schwer zugängliche Stellen." },
+        { id: "Teleskop", categoryId: "cat-1", label: "Teleskopbühne", iconKey: "boom", description: "Für maximale Höhe und Reichweite." },
+        { id: "Mast", categoryId: "cat-4", label: "Mastbühne", iconKey: "scissor", description: "Kompakt für enge Gänge." },
+        { id: "Frontstapler", categoryId: "cat-5", label: "Frontstapler", iconKey: "forklift", description: "Klassiker für den Palettentransport." },
     ],
     filters: {
         items: [
@@ -31,6 +31,7 @@ const STATIC_DEFAULTS = {
 };
 
 const MOCK_PRODUCTS: RecommendationResult = {
+    hasMatches: true,
     suitableDeviceTypes: [
         { id: "dt-1", label: "Scherenbühne" },
         { id: "dt-2", label: "Gelenkteleskop" }
@@ -150,19 +151,141 @@ export async function fetchConfiguratorData(locationSlug: string): Promise<Confi
     }
 }
 
-export async function fetchRecommendations(criteria: any): Promise<RecommendationResult> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(MOCK_PRODUCTS);
-        }, 600);
-    });
+export async function fetchRecommendations(criteria: { categoryId: string | null; filters: { sliders: Record<string, number>; selects: Record<string, string> } }): Promise<RecommendationResult> {
+    try {
+        const productsRes = await fetch('/api/admin/products', { cache: 'no-store' });
+        const allProductsRaw = productsRes.ok ? await productsRes.json() : [];
+
+        // 1. Map raw products to Configurator Product interface
+        const mappedProducts: Product[] = allProductsRaw.map((p: any) => ({
+            id: p.id,
+            title: p.name,
+            deviceTypeId: p.subcategory,
+            image: p.image,
+            specs: {
+                maxHeight: parseFloat(p.details?.height?.replace(',', '.').replace(/[^0-9.]/g, '') || '0'),
+                maxReach: parseFloat(p.details?.reach?.replace(',', '.').replace(/[^0-9.]/g, '') || '0'),
+                maxLoad: parseFloat(p.details?.load?.replace(',', '.').replace(/[^0-9.]/g, '') || '0'),
+            },
+            badges: p.details?.power ? [p.details.power] : ["Standard"],
+            price: p.price || 0
+        }));
+
+        // 2. Filter products based on criteria
+        const { sliders } = criteria.filters;
+        const reqHeight = sliders.height || 0;
+        const reqReach = sliders.reach || 0;
+        const reqLoad = sliders.load || 0;
+
+        const filteredProducts = mappedProducts.filter(p => {
+            // Basic filtering logic: product must meet or exceed requirements
+            const matchesHeight = p.specs.maxHeight >= reqHeight;
+            const matchesReach = p.specs.maxReach >= reqReach;
+            const matchesLoad = p.specs.maxLoad >= reqLoad;
+
+            return matchesHeight && matchesReach && matchesLoad;
+        });
+
+        const sortedProducts = mappedProducts.sort((a, b) => b.price - a.price); // Sort by price/size descending
+        const hasMatches = filteredProducts.length > 0;
+
+        // If no matches, return a subset of "Top Sellers" or just the first few products as alternatives
+        const finalProducts = hasMatches
+            ? filteredProducts
+            : sortedProducts.slice(0, 3); // Fallback to top 3 products
+
+        // 3. Extract unique device types from the products we're showing
+        const uniqueDeviceTypeIds = Array.from(new Set(finalProducts.map(p => p.deviceTypeId)));
+
+        // Try to match labels from STATIC_DEFAULTS or use the ID as label
+        const suitableDeviceTypes = uniqueDeviceTypeIds.map(id => {
+            const found = STATIC_DEFAULTS.deviceTypes.find(dt => dt.id === id);
+            return {
+                id: id,
+                label: found ? found.label : id
+            };
+        });
+
+        return {
+            suitableDeviceTypes,
+            products: finalProducts,
+            hasMatches
+        };
+    } catch (error) {
+        console.error("Error fetching recommendations:", error);
+        return {
+            ...MOCK_PRODUCTS,
+            hasMatches: false
+        };
+    }
 }
 
-export async function submitLead(data: any): Promise<{ leadId: string; status: string }> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log("LEAD SUBMITTED:", data);
-            resolve({ leadId: "LEAD-" + Math.floor(Math.random() * 10000), status: "received" });
-        }, 1200);
-    });
+export async function submitLead(state: any): Promise<{ leadId: string; status: string }> {
+    try {
+        // Map configurator state to inquiry format
+        const inquiryData = {
+            type: 'configurator',
+            contact: {
+                name: state.contact.name,
+                email: state.contact.email,
+                phone: state.contact.phone,
+                company: state.contact.company,
+                message: state.contact.message,
+                startDate: state.contact.startDate,
+                endDate: state.contact.endDate,
+                location: state.contact.location,
+                delivery: state.contact.delivery
+            },
+            categoryId: state.categoryId,
+            categoryLabel: state.configData?.categories.find((c: any) => c.id === state.categoryId)?.label || '',
+            deviceTypeId: state.deviceTypeId,
+            deviceTypeLabel: state.configData?.deviceTypes.find((d: any) => d.id === state.deviceTypeId)?.label || '',
+            selectedProducts: state.recommendations?.products
+                .filter((p: any) => state.selectedProductIds.includes(p.id))
+                .map((p: any) => ({
+                    id: p.id,
+                    title: p.title,
+                    price: p.price
+                })) || [],
+            requirements: state.requirements,
+            selectedExtras: state.configData?.extras
+                .filter((e: any) => state.selectedExtras.includes(e.id))
+                .map((e: any) => ({
+                    id: e.id,
+                    label: e.label,
+                    price: e.price,
+                    priceType: e.priceType
+                })) || [],
+            upsellingProducts: state.configData?.upsellingProducts
+                .filter((p: any) => state.addedUpsellingIds.includes(p.id))
+                .map((p: any) => ({
+                    id: p.id,
+                    title: p.title,
+                    price: p.price
+                })) || [],
+            locationSlug: state.configData?.location.slug || '',
+            locationName: state.configData?.location.name || ''
+        };
+
+        const response = await fetch('/api/inquiries/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(inquiryData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || 'Fehler beim Senden der Anfrage');
+        }
+
+        return {
+            leadId: result.inquiryId,
+            status: 'received'
+        };
+    } catch (error) {
+        console.error('Error submitting lead:', error);
+        throw error;
+    }
 }
+

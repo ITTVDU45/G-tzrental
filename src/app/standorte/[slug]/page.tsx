@@ -3,10 +3,12 @@
 import ConfiguratorShell from "@/components/configurator/core/ConfiguratorShell";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Phone, Mail, MapPin, Clock, Truck, Shield, GraduationCap, ChevronRight } from "lucide-react";
+import { Clock, Truck, Shield, GraduationCap, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { FaqSection } from "@/components/home/FaqSection";
+import { BlogSection } from "@/components/home/BlogSection";
 
 interface Product {
     id: string;
@@ -93,8 +95,6 @@ export default function LocationPage() {
         fetchLocationData();
     }, [slug]);
 
-
-
     if (loading) {
         return (
             <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center">
@@ -116,6 +116,25 @@ export default function LocationPage() {
             </div>
         );
     }
+
+    const locationFaqs = [
+        {
+            question: "Welche Mietdauer ist möglich?",
+            answer: "Unsere Geräte können flexibel gemietet werden – von kurzen Einsätzen bis hin zu langfristigen Projekten."
+        },
+        {
+            question: `Welche Geräte sind in ${location.name} verfügbar?`,
+            answer: "Die Verfügbarkeit richtet sich nach Standort und Zeitraum. Im Konfigurator sehen Sie direkt, welche Geräte aktuell verfügbar sind."
+        },
+        {
+            question: "Gibt es eine Einweisung oder Schulung?",
+            answer: "Auf Wunsch erhalten Sie eine Einweisung in die Bedienung der Geräte oder zusätzliche Serviceleistungen."
+        },
+        {
+            question: "Wie schnell kann ein Gerät bereitgestellt werden?",
+            answer: "In vielen Fällen ist eine kurzfristige Bereitstellung möglich – besonders bei regionaler Verfügbarkeit."
+        }
+    ];
 
     return (
         <div className="min-h-screen bg-white dark:bg-zinc-950">
@@ -207,8 +226,64 @@ export default function LocationPage() {
                 </div>
             </section>
 
+            {/* Content Section 1: Text Left / Image Right */}
+            <section className="py-24 bg-white dark:bg-zinc-950 overflow-hidden text-center lg:text-left">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col lg:flex-row items-center gap-16">
+                        <motion.div
+                            initial={{ opacity: 0, x: -50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="flex-1"
+                        >
+                            <h2 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-8 leading-tight">
+                                Arbeitsbühnen & Mietgeräte in {location.name} – <span className="text-brand-teal">flexibel, sicher und zuverlässig</span>
+                            </h2>
+                            <div className="space-y-6 text-lg text-zinc-600 dark:text-zinc-400">
+                                <p>
+                                    Bei der Miete von Arbeitsbühnen und Geräten in {location.name} kommt es auf Verfügbarkeit, Sicherheit und eine kompetente Beratung an. Genau hier setzen wir an: Wir bieten Ihnen moderne, regelmäßig gewartete Mietgeräte für unterschiedlichste Einsätze – vom privaten Projekt bis hin zum professionellen Dauereinsatz auf Baustellen oder in Industrie und Handwerk.
+                                </p>
+                                <p>
+                                    Unsere Geräte sind kurzfristig verfügbar und exakt auf Ihre Anforderungen abstimmbar. Ob Höhenzugang, Reichweite, Traglast oder Untergrund – wir unterstützen Sie bei der Auswahl der passenden Lösung. Durch unseren Standort in {location.name} profitieren Sie von schnellen Wegen, persönlichem Service und einer zuverlässigen Abwicklung.
+                                </p>
+                                <ul className="space-y-3 pt-4 inline-block lg:block text-left">
+                                    {[
+                                        "Moderne und geprüfte Mietgeräte",
+                                        "Flexible Mietzeiträume – stunden-, tage- oder wochenweise",
+                                        "Persönliche Beratung durch erfahrene Ansprechpartner",
+                                        "Schnelle Verfügbarkeit direkt in " + location.name
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-center gap-3">
+                                            <div className="w-6 h-6 rounded-full bg-brand-teal/10 flex items-center justify-center shrink-0">
+                                                <ChevronRight className="w-4 h-4 text-brand-teal" />
+                                            </div>
+                                            <span className="font-bold text-zinc-800 dark:text-zinc-200">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, x: 50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="flex-1 relative w-full"
+                        >
+                            <div className="relative aspect-square md:aspect-video lg:aspect-square rounded-[3rem] overflow-hidden shadow-2xl">
+                                <Image
+                                    src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=1200"
+                                    alt={`Service in ${location.name}`}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
             {/* Popular Equipment */}
-            <section className="py-24 bg-white dark:bg-zinc-950">
+            <section className="py-24 bg-zinc-50 dark:bg-zinc-900/30">
                 <div className="container mx-auto px-6">
                     <div className="flex items-center justify-between mb-12">
                         <h2 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-white">
@@ -228,11 +303,8 @@ export default function LocationPage() {
                                         transition={{ delay: index * 0.1 }}
                                         className="group relative bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] dark:from-zinc-800 dark:to-zinc-900 rounded-[2.5rem] overflow-hidden hover:shadow-2xl transition-all duration-500 border border-zinc-100 dark:border-zinc-800 flex flex-col"
                                     >
-                                        {/* Top: Image Area */}
                                         <div className="relative h-[260px] p-6 flex items-center justify-center overflow-hidden">
-                                            {/* Decorative circle blur for depth */}
                                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/40 dark:bg-white/5 rounded-full blur-3xl" />
-
                                             {product.image ? (
                                                 <Image
                                                     src={product.image}
@@ -245,8 +317,6 @@ export default function LocationPage() {
                                                     <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Kein Bild verfügbar</span>
                                                 </div>
                                             )}
-
-                                            {/* Availability Badge (Top Right) */}
                                             <div className="absolute top-5 right-5 z-20">
                                                 <div className="flex items-center gap-2 bg-white/60 dark:bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-white/50 dark:border-white/10">
                                                     <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse"></div>
@@ -255,9 +325,7 @@ export default function LocationPage() {
                                             </div>
                                         </div>
 
-                                        {/* Bottom: Content Area */}
                                         <div className="p-6 flex flex-col flex-1 bg-white dark:bg-zinc-950 rounded-t-[2.5rem] relative z-20 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
-                                            {/* Title & Category */}
                                             <div className="mb-6">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <span className="text-[10px] uppercase tracking-wider font-bold text-brand-teal">
@@ -269,7 +337,6 @@ export default function LocationPage() {
                                                 </h3>
                                             </div>
 
-                                            {/* Specs Grid */}
                                             <div className="grid grid-cols-2 gap-y-4 gap-x-4 mb-8">
                                                 {product.details?.height && (
                                                     <div className="flex flex-col">
@@ -297,7 +364,6 @@ export default function LocationPage() {
                                                 )}
                                             </div>
 
-                                            {/* Footer: Price & Action */}
                                             <div className="mt-auto flex items-center justify-between pt-6 border-t border-zinc-100 dark:border-zinc-900">
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] text-zinc-400 uppercase font-bold">Tagesmiete</span>
@@ -335,7 +401,73 @@ export default function LocationPage() {
                 </div>
             </section>
 
-            {/* Features */}
+            {/* Content Section 2: Image Left / Text Right */}
+            <section className="py-24 bg-white dark:bg-zinc-950 overflow-hidden text-center lg:text-left">
+                <div className="container mx-auto px-6">
+                    <div className="flex flex-col lg:flex-row-reverse items-center gap-16">
+                        <motion.div
+                            initial={{ opacity: 0, x: 50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="flex-1"
+                        >
+                            <h2 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-8 leading-tight">
+                                Die passende Lösung für <span className="text-brand-teal">Bau, Handwerk, Industrie & Events</span>
+                            </h2>
+                            <div className="space-y-6 text-lg text-zinc-600 dark:text-zinc-400">
+                                <p>
+                                    Unsere Mietgeräte kommen in zahlreichen Bereichen zum Einsatz – vom klassischen Bauprojekt über Wartungsarbeiten bis hin zu Events oder kurzfristigen Speziallösungen. Je nach Einsatzgebiet stellen wir Ihnen genau das Gerät zur Verfügung, das optimal zu Ihrem Vorhaben passt.
+                                </p>
+                                <p>
+                                    Dank einer breiten Auswahl an Arbeits- und Hebebühnen sowie weiteren Mietgeräten können wir nahezu jedes Szenario abdecken. Auch bei besonderen Anforderungen wie engen Platzverhältnissen, sensiblen Untergründen oder großen Höhen stehen wir Ihnen beratend zur Seite.
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 text-left">
+                                    {[
+                                        "Bau- und Sanierungsarbeiten",
+                                        "Montage- und Wartungseinsätze",
+                                        "Industrie- und Hallenarbeiten",
+                                        "Events, Messen und temporäre Installationen"
+                                    ].map((item, i) => (
+                                        <div key={i} className="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+                                            <div className="w-2 h-2 rounded-full bg-brand-teal" />
+                                            <span className="font-bold text-sm text-zinc-800 dark:text-zinc-200">{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="pt-4">
+                                    So stellen wir sicher, dass Sie in {location.name} jederzeit effizient, sicher und wirtschaftlich arbeiten können.
+                                </p>
+                            </div>
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, x: -50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="flex-1 relative w-full"
+                        >
+                            <div className="relative aspect-square md:aspect-video lg:aspect-square rounded-[3rem] overflow-hidden shadow-2xl">
+                                <Image
+                                    src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200"
+                                    alt="Lösungen Götz Rental"
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* FAQ Section */}
+            <FaqSection
+                title={`Häufige Fragen zur Geräte- & Arbeitsbühnenmiete in ${location.name}`}
+                items={locationFaqs}
+            />
+
+            {/* News & Ratgeber Section */}
+            <BlogSection />
+
+            {/* Features/Info-Boxen */}
             <section className="py-24 bg-zinc-50 dark:bg-zinc-900/50">
                 <div className="container mx-auto px-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
