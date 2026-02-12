@@ -151,7 +151,13 @@ export async function fetchConfiguratorData(locationSlug: string): Promise<Confi
     }
 }
 
-export async function fetchRecommendations(criteria: { categoryId: string | null; filters: { sliders: Record<string, number>; selects: Record<string, string> } }): Promise<RecommendationResult> {
+export type RecommendationCriteria = {
+    locationId?: string;
+    categoryId: string | null;
+    filters: { sliders: Record<string, number>; selects: Record<string, string> };
+};
+
+export async function fetchRecommendations(criteria: RecommendationCriteria): Promise<RecommendationResult> {
     try {
         const productsRes = await fetch('/api/admin/products', { cache: 'no-store' });
         const allProductsRaw = productsRes.ok ? await productsRes.json() : [];
