@@ -25,7 +25,7 @@ export function HeightSelector() {
     const selectedRange = heightRanges.find((r) => r.id === selectedId) || heightRanges[5];
 
     return (
-        <section className="py-24 bg-zinc-50 dark:bg-zinc-900/30">
+        <section id="konfigurator" className="py-24 bg-zinc-50 dark:bg-zinc-900/30">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold text-brand-dark mb-4">

@@ -571,14 +571,16 @@ export function Header() {
                                     <span className="hidden xl:inline">+49 123 456 789</span>
                                 </motion.a>
 
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-brand-teal to-brand-lime text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-brand-teal/30 transition-all"
-                                >
-                                    <User className="w-4 h-4" />
-                                    <span>Anmelden</span>
-                                </motion.button>
+                                <Link href="/#konfigurator">
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="flex items-center gap-2 bg-gradient-to-r from-brand-teal to-brand-lime text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-brand-teal/30 transition-all"
+                                    >
+                                        <LiftIcon className="w-4 h-4" />
+                                        <span>Konfigurieren</span>
+                                    </motion.button>
+                                </Link>
                             </div>
 
                             {/* Mobile Menu Toggle */}
@@ -619,9 +621,11 @@ export function Header() {
                                                 <LiftIcon className="w-5 h-5" /> Merkliste
                                             </button>
                                         </Link>
-                                        <button className="flex-1 py-3 justify-center flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-teal to-brand-lime text-white font-semibold">
-                                            <User className="w-4 h-4" /> Anmelden
-                                        </button>
+                                        <Link href="/#konfigurator" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                                            <button className="w-full py-3 justify-center flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-teal to-brand-lime text-white font-semibold">
+                                                <LiftIcon className="w-4 h-4" /> Konfigurieren
+                                            </button>
+                                        </Link>
                                     </div>
                                 </div>
                             </motion.div>
