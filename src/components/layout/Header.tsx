@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, Search, Phone, User, ArrowRight } from "lucide-react";
+import { Menu, X, ChevronDown, Search, Phone, Mail, Clock, ArrowRight, Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type MenuItem = {
@@ -14,6 +14,12 @@ type MenuItem = {
     link: string;
     highlight?: boolean;
     submenu?: { name: string; link: string }[];
+};
+
+type AdminPageLocation = {
+    status?: string;
+    name?: string;
+    slug?: string;
 };
 
 const LiftIcon = ({ className }: { className?: string }) => (
@@ -231,6 +237,34 @@ const companyMenuItems: MenuItem[] = [
 
 ];
 
+const topBarItems = [
+    {
+        icon: Clock,
+        label: "Öffnungszeiten",
+        content: "Mo-Fr 7:00-18:00 Uhr, Sa 8:00-14:00 Uhr",
+        href: "/kontakt",
+    },
+    {
+        icon: Mail,
+        label: "E-Mail",
+        content: "info@goetzrental.de",
+        href: "mailto:info@goetzrental.de",
+    },
+    {
+        icon: Phone,
+        label: "Telefon",
+        content: "+49 (0) 123 456 789-00",
+        href: "tel:+4912345678900",
+    },
+] as const;
+
+const socialItems = [
+    { icon: Instagram, label: "Instagram", href: "https://instagram.com" },
+    { icon: Facebook, label: "Facebook", href: "https://facebook.com" },
+    { icon: Linkedin, label: "LinkedIn", href: "https://linkedin.com" },
+    { icon: Youtube, label: "YouTube", href: "https://youtube.com" },
+] as const;
+
 export function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -255,14 +289,14 @@ export function Header() {
                     return;
                 }
                 const excludedSlugs = ['/', '/mieten', '/kontakt', '/unternehmen/ueber-uns'];
-                const publishedLocations = data
-                    .filter((loc: any) =>
+                const publishedLocations = (data as AdminPageLocation[])
+                    .filter((loc) =>
                         loc &&
                         loc.status === 'published' &&
                         loc.name &&
                         !excludedSlugs.includes(loc.slug)
                     )
-                    .map((loc: any) => {
+                    .map((loc) => {
                         const name = loc.name;
                         return {
                             name: name,
@@ -292,23 +326,99 @@ export function Header() {
                 isScrolled ? "top-2" : "top-4"
             )}
         >
-            <div className="container mx-auto px-0">
+            <div className="mx-auto w-full max-w-[1920px]">
                 <motion.div
+                    layout
+                    transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                     className={cn(
-                        "relative rounded-[2rem] transition-all duration-500 border",
+                        "overflow-visible rounded-[2rem] transition-all duration-500 border",
                         isScrolled
-                            ? "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-2xl border-zinc-200/50 dark:border-zinc-800/50"
+                            ? "bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl shadow-2xl border-zinc-200/60 dark:border-zinc-800/60"
                             : "bg-white dark:bg-zinc-900 shadow-xl border-zinc-100 dark:border-zinc-800"
                     )}
                 >
-                    <div className="px-6 md:px-8 py-4">
-                        <div className="flex items-center justify-between">
+                    <AnimatePresence initial={false}>
+                        {!isScrolled && (
+                            <motion.div
+                                key="desktop-topbar"
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                                className="hidden overflow-hidden border-b border-zinc-100/80 bg-zinc-50/80 text-sm dark:border-zinc-800/80 dark:bg-zinc-950/40 lg:block"
+                            >
+                                <div className="flex items-center justify-between gap-6 px-8 py-3">
+                                    <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
+                                        {topBarItems.map((item) => {
+                                            const Icon = item.icon;
+
+                                            return (
+                                                <a
+                                                    key={item.label}
+                                                    href={item.href}
+                                                    className="flex min-w-0 items-center gap-3 text-zinc-600 transition-colors hover:text-brand-teal dark:text-zinc-300 dark:hover:text-brand-teal"
+                                                >
+                                                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-teal shadow-sm dark:bg-zinc-900">
+                                                        <Icon className="h-4 w-4" />
+                                                    </span>
+                                                    <span className="min-w-0">
+                                                        <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
+                                                            {item.label}
+                                                        </span>
+                                                        <span className="block truncate font-semibold text-zinc-700 dark:text-zinc-200">
+                                                            {item.content}
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            );
+                                        })}
+                                    </div>
+                                    <div className="flex shrink-0 items-center gap-2">
+                                        {socialItems.map((item) => {
+                                            const Icon = item.icon;
+
+                                            return (
+                                                <a
+                                                    key={item.label}
+                                                    href={item.href}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    aria-label={item.label}
+                                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-zinc-600 shadow-sm transition-all hover:-translate-y-0.5 hover:text-brand-teal dark:bg-zinc-900 dark:text-zinc-300"
+                                                >
+                                                    <Icon className="h-4 w-4" />
+                                                </a>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <motion.div
+                        layout
+                        transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                        className="px-6 md:px-8"
+                        animate={{ paddingTop: isScrolled ? 10 : 16, paddingBottom: isScrolled ? 10 : 16 }}
+                    >
+                        <motion.div
+                            layout
+                            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                            className="flex items-center justify-between gap-6"
+                        >
                             {/* Logo */}
                             <Link href="/" className="z-50 shrink-0">
                                 <motion.div
+                                    layout
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className="relative h-14 w-56 md:h-18 md:w-72"
+                                    transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                                    animate={{
+                                        width: isScrolled ? 208 : 288,
+                                        height: isScrolled ? 48 : 72,
+                                    }}
+                                    className="relative"
                                 >
                                     <Image
                                         src="/GötzRental2.png"
@@ -321,20 +431,39 @@ export function Header() {
                             </Link>
 
                             {/* Desktop Navigation */}
-                            <nav className="hidden lg:flex items-center gap-2">
+                            <motion.nav
+                                layout
+                                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                                className="hidden min-w-0 flex-1 items-center justify-center lg:flex"
+                                animate={{ gap: isScrolled ? 6 : 8 }}
+                            >
                                 {navItems.map((item, index) => (
                                     <motion.div
+                                        layout
                                         key={item.name}
                                         initial={{ opacity: 0, y: -20 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.1 }}
+                                        transition={{
+                                            delay: index * 0.1,
+                                            duration: 0.35,
+                                            ease: [0.4, 0, 0.2, 1],
+                                        }}
                                         className={cn("group", !item.megaMenu && "relative")}
                                         onMouseEnter={() => setActiveDropdown(item.name)}
                                         onMouseLeave={() => setActiveDropdown(null)}
                                     >
+                                        <motion.div
+                                            layout
+                                            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                                        >
                                         <Link
                                             href={item.href}
-                                            className="flex items-center gap-1 px-4 py-2.5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:text-brand-teal dark:hover:text-brand-teal transition-colors rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                                            className={cn(
+                                                "flex items-center gap-1 font-semibold text-zinc-700 transition-colors hover:text-brand-teal dark:text-zinc-300 dark:hover:text-brand-teal rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+                                                isScrolled
+                                                    ? "px-3 py-2 text-[13px]"
+                                                    : "px-4 py-2.5 text-sm"
+                                            )}
                                         >
                                             {item.name}
                                             {(item.megaMenu || item.enhancedDropdown) && (
@@ -344,6 +473,7 @@ export function Header() {
                                                 )} />
                                             )}
                                         </Link>
+                                        </motion.div>
 
                                         <AnimatePresence>
                                             {activeDropdown === item.name && item.megaMenu && (
@@ -527,25 +657,38 @@ export function Header() {
 
                                     </motion.div>
                                 ))}
-                            </nav>
+                            </motion.nav>
 
                             {/* Actions */}
-                            <div className="hidden lg:flex items-center gap-3">
+                            <motion.div
+                                layout
+                                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                                className="hidden shrink-0 items-center lg:flex"
+                                animate={{ gap: isScrolled ? 8 : 12 }}
+                            >
                                 <motion.button
+                                    layout
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="p-2.5 text-zinc-600 dark:text-zinc-400 hover:text-brand-teal dark:hover:text-brand-teal hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-xl transition-all"
+                                    className={cn(
+                                        "text-zinc-600 dark:text-zinc-400 hover:text-brand-teal dark:hover:text-brand-teal hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-xl transition-all",
+                                        isScrolled ? "p-2" : "p-2.5"
+                                    )}
                                 >
-                                    <Search className="w-5 h-5" />
+                                    <Search className={cn("transition-all duration-500", isScrolled ? "w-4 h-4" : "w-5 h-5")} />
                                 </motion.button>
 
                                 <Link href="/cart">
                                     <motion.div
+                                        layout
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="relative p-2.5 text-zinc-600 dark:text-zinc-400 hover:text-brand-teal dark:hover:text-brand-teal hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-xl transition-all group"
+                                        className={cn(
+                                            "relative text-zinc-600 dark:text-zinc-400 hover:text-brand-teal dark:hover:text-brand-teal hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-xl transition-all group",
+                                            isScrolled ? "p-2" : "p-2.5"
+                                        )}
                                     >
-                                        <LiftIcon className="w-6 h-6 transition-transform group-hover:-translate-y-1" />
+                                        <LiftIcon className={cn("transition-transform group-hover:-translate-y-1 duration-500", isScrolled ? "w-5 h-5" : "w-6 h-6")} />
                                         <div className="absolute top-1.5 right-1.5 flex items-center justify-center">
                                             <span className="relative flex h-2 w-2">
                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-teal opacity-75"></span>
@@ -561,27 +704,23 @@ export function Header() {
                                     </motion.div>
                                 </Link>
 
-                                <motion.a
-                                    href="tel:+4912345678900"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-zinc-700 dark:text-zinc-300 hover:text-brand-teal dark:hover:text-brand-teal hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-xl transition-all"
-                                >
-                                    <Phone className="w-4 h-4" />
-                                    <span className="hidden xl:inline">+49 123 456 789</span>
-                                </motion.a>
-
                                 <Link href="/#konfigurator">
                                     <motion.button
+                                        layout
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="flex items-center gap-2 bg-gradient-to-r from-brand-teal to-brand-lime text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-brand-teal/30 transition-all"
+                                        className={cn(
+                                            "flex items-center bg-gradient-to-r from-brand-teal to-brand-lime text-white font-bold hover:shadow-lg hover:shadow-brand-teal/30 rounded-xl transition-all duration-500",
+                                            isScrolled
+                                                ? "gap-1.5 px-4 py-2 text-[13px]"
+                                                : "gap-2 px-6 py-2.5 text-sm"
+                                        )}
                                     >
-                                        <LiftIcon className="w-4 h-4" />
+                                        <LiftIcon className={cn("transition-all duration-500", isScrolled ? "w-3.5 h-3.5" : "w-4 h-4")} />
                                         <span>Konfigurieren</span>
                                     </motion.button>
                                 </Link>
-                            </div>
+                            </motion.div>
 
                             {/* Mobile Menu Toggle */}
                             <motion.button
@@ -591,8 +730,8 @@ export function Header() {
                             >
                                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                             </motion.button>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
 
                     {/* Mobile Menu */}
                     <AnimatePresence>
@@ -604,6 +743,49 @@ export function Header() {
                                 className="lg:hidden border-t border-zinc-100 dark:border-zinc-800 overflow-hidden"
                             >
                                 <div className="px-6 py-4 flex flex-col gap-2">
+                                    <div className="mb-1 flex items-center justify-center gap-2">
+                                        {socialItems.map((item) => {
+                                            const Icon = item.icon;
+
+                                            return (
+                                                <a
+                                                    key={item.label}
+                                                    href={item.href}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    aria-label={item.label}
+                                                    className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-50 text-zinc-600 transition-all hover:text-brand-teal dark:bg-zinc-900 dark:text-zinc-300"
+                                                >
+                                                    <Icon className="h-4 w-4" />
+                                                </a>
+                                            );
+                                        })}
+                                    </div>
+                                    <div className="mb-3 grid gap-2 rounded-2xl bg-zinc-50 p-3 dark:bg-zinc-900/70">
+                                        {topBarItems.map((item) => {
+                                            const Icon = item.icon;
+
+                                            return (
+                                                <a
+                                                    key={item.label}
+                                                    href={item.href}
+                                                    className="flex items-start gap-3 rounded-xl px-3 py-2 text-zinc-700 transition-colors hover:bg-white hover:text-brand-teal dark:text-zinc-200 dark:hover:bg-zinc-800"
+                                                >
+                                                    <span className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white text-brand-teal dark:bg-zinc-800">
+                                                        <Icon className="h-4 w-4" />
+                                                    </span>
+                                                    <span>
+                                                        <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-zinc-400 dark:text-zinc-500">
+                                                            {item.label}
+                                                        </span>
+                                                        <span className="block text-sm font-semibold">
+                                                            {item.content}
+                                                        </span>
+                                                    </span>
+                                                </a>
+                                            );
+                                        })}
+                                    </div>
                                     {navItems.map((item) => (
                                         <div key={item.name} className="flex flex-col gap-2">
                                             <Link

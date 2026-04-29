@@ -39,13 +39,6 @@ interface HeroCarouselProps {
 export function HeroCarousel({ onExploreClick }: HeroCarouselProps) {
     const [current, setCurrent] = useState(0);
 
-    // Safety check: reset current index if it exceeds the length of slides (useful for HMR)
-    useEffect(() => {
-        if (current >= slides.length) {
-            setCurrent(0);
-        }
-    }, [current]);
-
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrent((prev) => (prev + 1) % slides.length);
@@ -60,8 +53,8 @@ export function HeroCarousel({ onExploreClick }: HeroCarouselProps) {
     const activeSlide = slides[current] || slides[0];
 
     return (
-        <section className="py-6 md:py-8 bg-zinc-50 dark:bg-zinc-900/30">
-            <div className="container mx-auto px-4 md:px-6">
+        <section className="bg-zinc-50 pt-6 pb-6 md:pt-8 md:pb-8 lg:pt-8 dark:bg-zinc-900/30">
+            <div className="mx-auto w-full max-w-[1920px] px-4">
                 <div className="relative h-[600px] w-full overflow-hidden rounded-[3rem] bg-brand-dark shadow-2xl border border-zinc-100 dark:border-zinc-800">
                     <AnimatePresence mode="wait">
                         <motion.div

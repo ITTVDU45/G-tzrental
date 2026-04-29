@@ -11,7 +11,7 @@ export default function ConditionalNavigation({ children }: { children: React.Re
     return (
         <>
             {!isAdminPage && <Header />}
-            <main className={!isAdminPage ? "min-h-screen pt-20" : "min-h-screen"}>
+            <main className={!isAdminPage ? "min-h-screen pt-24 lg:pt-44" : "min-h-screen"}>
                 {children}
             </main>
             {!isAdminPage && <Footer />}
