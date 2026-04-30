@@ -5,17 +5,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { I_Any } from "@/lib/types";
 
 export default function BlogListingPage() {
-    const [posts, setPosts] = useState<any[]>([]);
+    const [posts, setPosts] = useState<I_Any[]>([]);
+    const [pageData, setPageData] = useState<I_Any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const res = await fetch('/api/admin/blog');
-                const data = await res.json();
-                setPosts(data.filter((p: any) => p.status === 'published'));
+                const [pageRes, postsRes] = await Promise.all([
+                    fetch('/api/cms?type=page_blog_listing', { cache: 'no-store' }),
+                    fetch('/api/admin/blog')
+                ]);
+                const [page, data] = await Promise.all([pageRes.json(), postsRes.json()]);
+                setPageData(page);
+                setPosts(data.filter((p: I_Any) => p.status === 'published'));
             } catch (err) {
                 console.error(err);
             } finally {
@@ -38,10 +44,10 @@ export default function BlogListingPage() {
 
                 <div className="max-w-4xl mb-16">
                     <h1 className="text-4xl md:text-6xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter mb-6">
-                        Aktuelles & Fachwissen
+                        {pageData?.hero?.title || "Aktuelles & Fachwissen"}
                     </h1>
                     <p className="text-xl text-zinc-500 font-medium leading-relaxed">
-                        Entdecken Sie unsere neuesten Beiträge zu Arbeitssicherheit, Gerätewahl und Branchen-News.
+                        {pageData?.hero?.description || "Entdecken Sie unsere neuesten Beiträge zu Arbeitssicherheit, Gerätewahl und Branchen-News."}
                     </p>
                 </div>
 

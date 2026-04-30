@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Only protect /admin paths except /admin/login
     if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
         const session = request.cookies.get('admin_session');
 

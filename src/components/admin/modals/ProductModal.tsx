@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Plus, Trash2, FileText } from "lucide-react";
 import { Reorder } from "framer-motion";
 import ImagePicker from "../ImagePicker";
 import FilePicker from "../FilePicker";
+import { I_Any } from "@/lib/types";
 
 interface DetailItem {
     id: string;
@@ -24,6 +25,7 @@ interface Product {
     category: string;
     subcategory: string;
     image: string;
+    gallery?: string[];
     description: string;
     insuranceText?: string;
     insuranceBadges?: { id: string; text: string }[];
@@ -31,7 +33,8 @@ interface Product {
     datasheet?: string;
     datasheetName?: string;
     documents?: ProductDocument[];
-    details: any; // Allow array or legacy object
+    details: I_Any; // Allow array or legacy object
+    showInMenu?: boolean;
 }
 
 interface ProductModalProps {
@@ -42,12 +45,21 @@ interface ProductModalProps {
     categories: string[];
 }
 
-export default function ProductModal({ isOpen, onCloseAction, onSaveAction, product, categories }: ProductModalProps) {
-    const [formData, setFormData] = useState<Partial<Product>>({
+function createFormState(product?: Product | null, categories: string[] = []): Partial<Product> {
+    if (product) {
+        return {
+            ...product,
+            gallery: product.gallery || [],
+            insuranceBadges: product.insuranceBadges || []
+        };
+    }
+
+    return {
         name: "",
-        category: "",
+        category: categories[0] || "",
         subcategory: "",
         image: "",
+        gallery: [],
         description: "",
         insuranceText: "",
         insuranceBadges: [],
@@ -55,87 +67,74 @@ export default function ProductModal({ isOpen, onCloseAction, onSaveAction, prod
         datasheet: "",
         datasheetName: "",
         documents: [],
-        details: []
-    });
+        details: [],
+        showInMenu: false
+    };
+}
 
-    const [detailsList, setDetailsList] = useState<DetailItem[]>([]);
-    const [documentsList, setDocumentsList] = useState<ProductDocument[]>([]);
+function createDetailsState(product?: Product | null): DetailItem[] {
+    if (product) {
+        if (product.details && !Array.isArray(product.details)) {
+            const legacyDetails: DetailItem[] = [];
+            const labelMap: Record<string, string> = {
+                height: "Arbeitshöhe",
+                reach: "Reichweite",
+                load: "Tragkraft",
+                power: "Antrieb",
+                weight: "Gewicht",
+                transportWidth: "Breite"
+            };
+
+            Object.entries(product.details).forEach(([key, value]) => {
+                if (value) {
+                    legacyDetails.push({
+                        id: key,
+                        label: labelMap[key] || key,
+                        value: String(value)
+                    });
+                }
+            });
+            return legacyDetails;
+        }
+
+        if (Array.isArray(product.details)) {
+            return product.details;
+        }
+
+        return [];
+    }
+
+    return [
+        { id: "d1", label: "Arbeitshöhe", value: "" },
+        { id: "d2", label: "Reichweite", value: "" },
+        { id: "d3", label: "Tragkraft", value: "" },
+        { id: "d4", label: "Antrieb", value: "" },
+    ];
+}
+
+function createDocumentsState(product?: Product | null): ProductDocument[] {
+    if (product?.documents && Array.isArray(product.documents)) {
+        return product.documents;
+    }
+
+    if (product?.datasheet) {
+        return [{
+            id: "legacy-datasheet",
+            name: product.datasheetName || "Datenblatt",
+            url: product.datasheet
+        }];
+    }
+
+    return [];
+}
+
+export default function ProductModal({ isOpen, onCloseAction, onSaveAction, product, categories }: ProductModalProps) {
+    const [formData, setFormData] = useState<Partial<Product>>(() => createFormState(product, categories));
+    const [detailsList, setDetailsList] = useState<DetailItem[]>(() => createDetailsState(product));
+    const [documentsList, setDocumentsList] = useState<ProductDocument[]>(() => createDocumentsState(product));
     const [newBadge, setNewBadge] = useState("");
     const [newDocName, setNewDocName] = useState("");
     const [newDocUrl, setNewDocUrl] = useState("");
-
-    useEffect(() => {
-        setNewBadge(""); // Reset new badge input
-        if (product) {
-            setFormData({
-                ...product,
-                insuranceBadges: product.insuranceBadges || []
-            });
-
-            // Convert details to array if it's an object (legacy support)
-            if (product.details && !Array.isArray(product.details)) {
-                const legacyDetails: DetailItem[] = [];
-                // Map standard keys to nice labels
-                const labelMap: Record<string, string> = {
-                    height: "Arbeitshöhe",
-                    reach: "Reichweite",
-                    load: "Tragkraft",
-                    power: "Antrieb",
-                    weight: "Gewicht",
-                    transportWidth: "Breite"
-                };
-
-                Object.entries(product.details).forEach(([key, value]) => {
-                    if (value) {
-                        legacyDetails.push({
-                            id: key, // Use key as simple ID
-                            label: labelMap[key] || key,
-                            value: String(value)
-                        });
-                    }
-                });
-                setDetailsList(legacyDetails);
-            } else if (Array.isArray(product.details)) {
-                setDetailsList(product.details);
-            } else {
-                setDetailsList([]);
-            }
-            if (product.documents && Array.isArray(product.documents)) {
-                setDocumentsList(product.documents);
-            } else if (product.datasheet) {
-                setDocumentsList([{
-                    id: 'legacy-datasheet',
-                    name: product.datasheetName || 'Datenblatt',
-                    url: product.datasheet
-                }]);
-            } else {
-                setDocumentsList([]);
-            }
-        } else {
-            setFormData({
-                name: "",
-                category: categories[0] || "",
-                subcategory: "",
-                image: "",
-                description: "",
-                insuranceText: "",
-                insuranceBadges: [],
-                price: 0,
-                datasheet: "",
-                datasheetName: "",
-                details: []
-            });
-            setDetailsList([
-                { id: "d1", label: "Arbeitshöhe", value: "" },
-                { id: "d2", label: "Reichweite", value: "" },
-                { id: "d3", label: "Tragkraft", value: "" },
-                { id: "d4", label: "Antrieb", value: "" },
-            ]);
-            setDocumentsList([]);
-        }
-        setNewDocName("");
-        setNewDocUrl("");
-    }, [product, isOpen, categories]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -267,6 +266,19 @@ export default function ProductModal({ isOpen, onCloseAction, onSaveAction, prod
                                     className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl py-4 px-6 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal/50 transition-all font-bold"
                                 />
                             </div>
+                            
+                            <div className="flex items-center gap-3 pt-2">
+                                <input
+                                    type="checkbox"
+                                    id="showInMenu"
+                                    checked={formData.showInMenu || false}
+                                    onChange={(e) => setFormData({ ...formData, showInMenu: e.target.checked })}
+                                    className="w-5 h-5 rounded border-zinc-300 text-brand-teal focus:ring-brand-teal cursor-pointer"
+                                />
+                                <label htmlFor="showInMenu" className="text-sm font-bold text-zinc-700 dark:text-zinc-300 cursor-pointer">
+                                    Im Menü anzeigen
+                                </label>
+                            </div>
                         </div>
 
                         <div className="space-y-6">
@@ -275,6 +287,62 @@ export default function ProductModal({ isOpen, onCloseAction, onSaveAction, prod
                                 value={formData.image || ''}
                                 onChangeAction={(url: string) => setFormData({ ...formData, image: url })}
                             />
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">
+                                        Galerie
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData({
+                                            ...formData,
+                                            gallery: [...(formData.gallery || []), ""]
+                                        })}
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-brand-teal transition-colors"
+                                    >
+                                        <Plus className="w-3 h-3" />
+                                        Bild hinzufügen
+                                    </button>
+                                </div>
+
+                                {(formData.gallery || []).length > 0 ? (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {(formData.gallery || []).map((galleryImage, index) => (
+                                            <div key={`${galleryImage || "empty"}-${index}`} className="flex flex-col gap-2 rounded-[1.5rem] border border-zinc-100 dark:border-zinc-800 p-3 bg-zinc-50/70 dark:bg-zinc-800/40">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                                                        Galerie Bild {index + 1}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setFormData({
+                                                            ...formData,
+                                                            gallery: (formData.gallery || []).filter((_, itemIndex) => itemIndex !== index)
+                                                        })}
+                                                        className="p-2 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-white dark:hover:bg-zinc-900 transition-colors"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+
+                                                <ImagePicker
+                                                    label={`Galerie Bild ${index + 1}`}
+                                                    value={galleryImage}
+                                                    onChangeAction={(url: string) => setFormData({
+                                                        ...formData,
+                                                        gallery: (formData.gallery || []).map((item, itemIndex) => itemIndex === index ? url : item)
+                                                    })}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-700 p-6 text-center text-xs font-medium text-zinc-400">
+                                        Noch keine Galerie-Bilder hinzugefügt.
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 

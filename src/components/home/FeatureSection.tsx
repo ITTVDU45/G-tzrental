@@ -13,9 +13,21 @@ const features = [
 
 interface FeatureSectionProps {
     onCtaClick?: () => void;
+    content?: {
+        title?: string;
+        description?: string;
+        bullets?: string[];
+        ctaLabel?: string;
+        image?: string;
+        socialProof?: {
+            label?: string;
+            quote?: string;
+        };
+    };
 }
 
-export function FeatureSection({ onCtaClick }: FeatureSectionProps) {
+export function FeatureSection({ onCtaClick, content }: FeatureSectionProps) {
+    const bullets = content?.bullets && content.bullets.length > 0 ? content.bullets : features;
     return (
         <section className="py-24 bg-white overflow-hidden">
             <div className="container mx-auto px-4 md:px-6">
@@ -29,15 +41,14 @@ export function FeatureSection({ onCtaClick }: FeatureSectionProps) {
                         transition={{ duration: 0.6 }}
                     >
                         <h2 className="text-4xl md:text-5xl font-extrabold text-brand-dark leading-tight mb-6">
-                            Effiziente <span className="text-brand-teal">Mietlösungen</span> für Ihr nächstes Projekt
+                            {content?.title || <>Effiziente <span className="text-brand-teal">Mietlösungen</span> für Ihr nächstes Projekt</>}
                         </h2>
                         <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                            Ob Großbaustelle oder privates Projekt – wir bieten Ihnen die passende Technik zur richtigen Zeit.
-                            Profitieren Sie von unserer jahrzehntelangen Erfahrung und einem Maschinenpark, der keine Wünsche offen lässt.
+                            {content?.description || "Ob Großbaustelle oder privates Projekt – wir bieten Ihnen die passende Technik zur richtigen Zeit. Profitieren Sie von unserer jahrzehntelangen Erfahrung und einem Maschinenpark, der keine Wünsche offen lässt."}
                         </p>
 
                         <ul className="space-y-4 mb-10">
-                            {features.map((feature, index) => (
+                            {bullets.map((feature, index) => (
                                 <motion.li
                                     key={index}
                                     initial={{ opacity: 0, y: 10 }}
@@ -56,7 +67,7 @@ export function FeatureSection({ onCtaClick }: FeatureSectionProps) {
                             onClick={onCtaClick}
                             className="group flex items-center gap-2 bg-brand-dark text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-brand-teal transition-all duration-300 shadow-xl shadow-brand-dark/10 hover:shadow-brand-teal/20 transform hover:-translate-y-1"
                         >
-                            Jetzt Gerät finden
+                            {content?.ctaLabel || "Jetzt Gerät finden"}
                             <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                         </button>
                     </motion.div>
@@ -72,7 +83,7 @@ export function FeatureSection({ onCtaClick }: FeatureSectionProps) {
                         {/* Main Image */}
                         <div className="relative aspect-square md:aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
                             <Image
-                                src="/Baustelle2.png"
+                                src={content?.image || "/Baustelle2.png"}
                                 alt="Professioneller Einsatz modernster Mietmaschinen auf der Baustelle"
                                 fill
                                 className="object-cover"
@@ -102,10 +113,10 @@ export function FeatureSection({ onCtaClick }: FeatureSectionProps) {
                                         </div>
                                     ))}
                                 </div>
-                                <div className="text-sm font-bold text-brand-dark">Top Bewertung</div>
+                                <div className="text-sm font-bold text-brand-dark">{content?.socialProof?.label || "Top Bewertung"}</div>
                             </div>
                             <p className="text-gray-500 text-sm italic">
-                                "Hervorragender Service und top gewartete Maschinen. Immer wieder gerne!"
+                                &quot;{content?.socialProof?.quote || "Hervorragender Service und top gewartete Maschinen. Immer wieder gerne!"}&quot;
                             </p>
                         </motion.div>
                     </motion.div>

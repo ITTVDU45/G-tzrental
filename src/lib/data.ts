@@ -1,16 +1,16 @@
-import { readDb } from './db';
+import { COLLECTIONS, listSeededCollection } from "@/lib/mongo-admin";
+import { products as mockProducts } from "@/data/mockProducts";
+import { I_Any } from "@/lib/types";
 
 export async function getProducts() {
-    const db = await readDb();
-    return db?.products || [];
+    return listSeededCollection(COLLECTIONS.products, "products", mockProducts);
 }
 
 export async function getProductById(id: string) {
     const products = await getProducts();
-    return products.find((p: any) => p.id === id);
+    return products.find((p: I_Any) => p.id === id);
 }
 
 export async function getCategories() {
-    const db = await readDb();
-    return db?.categories || [];
+    return listSeededCollection(COLLECTIONS.categories, "categories");
 }

@@ -27,7 +27,7 @@ export default function AdminLocationsPage() {
 
     const fetchLocations = async () => {
         try {
-            const res = await fetch('/api/admin/pages');
+            const res = await fetch('/api/admin/locations');
             const data = await res.json();
             setLocations(data);
         } catch (err) {
@@ -86,7 +86,7 @@ export default function AdminLocationsPage() {
 
     const handleDelete = async (item: Location) => {
         if (confirm(`Standort "${item.name}" wirklich löschen?`)) {
-            await fetch('/api/admin/pages', {
+            await fetch('/api/admin/locations', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: item.id }),
@@ -97,7 +97,7 @@ export default function AdminLocationsPage() {
 
     const handleSave = async (formData: Partial<Location>) => {
         try {
-            const res = await fetch('/api/admin/pages', {
+            const res = await fetch('/api/admin/locations', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),

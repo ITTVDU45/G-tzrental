@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getProductById, getProducts } from "@/lib/data";
+import { getProductPageDocument } from "@/lib/frontend-pages";
 import ProductTemplate from "@/components/products/ProductTemplate";
+import { I_Any } from "@/lib/types";
 
 interface ProductPageProps {
     params: Promise<{
@@ -10,9 +12,10 @@ interface ProductPageProps {
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
     const { id } = await params;
-    const [product, allProducts] = await Promise.all([
+    const [product, allProducts, pageData] = await Promise.all([
         getProductById(id),
-        getProducts()
+        getProducts(),
+        getProductPageDocument(id),
     ]);
 
     if (!product) {
@@ -20,15 +23,15 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     }
 
     const alternatives = allProducts
-        .filter((p: any) => p.category === product.category && p.id !== id)
-        .slice(0, 6);
+        .filter((p: I_Any) => p.category === product.category && p.id !== id)
+        .slice(0, pageData?.references?.alternativeLimit || 6);
 
     return <ProductTemplate product={product} alternatives={alternatives} />;
 }
 
 export async function generateStaticParams() {
     const products = await getProducts();
-    return products.map((product: any) => ({
+    return products.map((product: I_Any) => ({
         id: product.id,
     }));
 }

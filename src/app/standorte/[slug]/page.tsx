@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { FaqSection } from "@/components/home/FaqSection";
 import { BlogSection } from "@/components/home/BlogSection";
+import { I_Any } from "@/lib/types";
 
 interface Product {
     id: string;
@@ -16,7 +17,7 @@ interface Product {
     image: string;
     price: string | number;
     subcategory: string;
-    details: any;
+    details: I_Any;
     badge?: string;
 }
 
@@ -54,6 +55,7 @@ export default function LocationPage() {
     const params = useParams();
     const slug = params.slug as string;
 
+    const [pageData, setPageData] = useState<I_Any>(null);
     const [location, setLocation] = useState<Location | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -61,23 +63,27 @@ export default function LocationPage() {
     useEffect(() => {
         const fetchLocationData = async () => {
             try {
-                // Fetch location by slug
-                const locRes = await fetch('/api/admin/pages');
-                const locations = await locRes.json();
-                const currentLocation = locations.find((loc: Location) =>
-                    loc.name.toLowerCase().replace(/\s+/g, '-').replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss') === slug
-                );
+                const [pageRes, prodRes] = await Promise.all([
+                    fetch(`/api/cms?type=page_location_${slug}`, { cache: 'no-store' }),
+                    fetch('/api/admin/products')
+                ]);
+                const [page, allProducts] = await Promise.all([pageRes.json(), prodRes.json()]);
 
-                if (!currentLocation || currentLocation.status !== 'published') {
+                if (!page || page.error) {
                     setLoading(false);
                     return;
                 }
 
-                setLocation(currentLocation);
+                setPageData(page);
 
-                // Fetch all products
-                const prodRes = await fetch('/api/admin/products');
-                const allProducts = await prodRes.json();
+                const currentLocation = {
+                    id: page.references?.locationId || slug,
+                    name: page.hero?.title?.match(/in (.+) mieten\?/i)?.[1] || slug,
+                    status: page.status || 'published',
+                    productIds: page.references?.productIds || []
+                };
+
+                setLocation(currentLocation);
 
                 // Filter products based on location's productIds
                 const assignedProducts = allProducts.filter((prod: Product) =>
@@ -117,7 +123,7 @@ export default function LocationPage() {
         );
     }
 
-    const locationFaqs = [
+    const locationFaqs = pageData?.faq?.items || [
         {
             question: "Welche Mietdauer ist möglich?",
             answer: "Unsere Geräte können flexibel gemietet werden – von kurzen Einsätzen bis hin zu langfristigen Projekten."
@@ -149,7 +155,7 @@ export default function LocationPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="text-sm font-bold text-brand-teal uppercase tracking-wider mb-4"
                             >
-                                Arbeitsbühnen am Standort {location.name}
+                                {pageData?.hero?.eyebrow || `Arbeitsbühnen am Standort ${location.name}`}
                             </motion.p>
                             <motion.h1
                                 initial={{ opacity: 0, y: 20 }}
@@ -157,7 +163,7 @@ export default function LocationPage() {
                                 transition={{ delay: 0.1 }}
                                 className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-6 leading-[1.1]"
                             >
-                                Du möchtest eine Arbeitsbühne in <span className="text-brand-teal">{location.name} mieten?</span>
+                                {pageData?.hero?.title || <>Du möchtest eine Arbeitsbühne in <span className="text-brand-teal">{location.name} mieten?</span></>}
                             </motion.h1>
                             <motion.p
                                 initial={{ opacity: 0, y: 20 }}
@@ -165,7 +171,7 @@ export default function LocationPage() {
                                 transition={{ delay: 0.2 }}
                                 className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-2xl mx-auto lg:mx-0"
                             >
-                                Bei GÖTZ RENTAL in {location.name} mietest du flexibel und jederzeit verfügbare Modelle: ob für Bauvorhaben, Wartungsarbeiten oder Events.
+                                {pageData?.hero?.description || `Bei GÖTZ RENTAL in ${location.name} mietest du flexibel und jederzeit verfügbare Modelle: ob für Bauvorhaben, Wartungsarbeiten oder Events.`}
                             </motion.p>
                         </div>
 
@@ -178,7 +184,7 @@ export default function LocationPage() {
                         >
                             <div className="relative w-full h-[300px] md:h-[400px] rounded-[2.5rem] overflow-hidden shadow-2xl">
                                 <Image
-                                    src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=2000"
+                                    src={pageData?.hero?.image || "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=2000"}
                                     alt={`Götz Rental ${location.name}`}
                                     fill
                                     className="object-cover hover:scale-105 transition-transform duration-700"
@@ -207,19 +213,19 @@ export default function LocationPage() {
                         <div className="text-center md:text-left">
                             <p className="text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Adresse</p>
                             <p className="font-bold text-zinc-900 dark:text-white mb-1">GÖTZ RENTAL Arbeitsbühnen und Stapler</p>
-                            <p className="text-zinc-600 dark:text-zinc-400">Musterstraße 123</p>
-                            <p className="text-zinc-600 dark:text-zinc-400">D-40210 {location.name}</p>
+                            <p className="text-zinc-600 dark:text-zinc-400">{pageData?.contact?.addressLines?.[0] || "Musterstraße 123"}</p>
+                            <p className="text-zinc-600 dark:text-zinc-400">{pageData?.contact?.addressLines?.[1] || `D-40210 ${location.name}`}</p>
                         </div>
                         <div className="text-center md:text-left">
                             <p className="text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">E-Mail</p>
-                            <a href={`mailto:${location.name.toLowerCase()}@goetz-rental.de`} className="text-brand-teal font-bold hover:underline">
-                                {location.name.toLowerCase()}@goetz-rental.de
+                            <a href={`mailto:${pageData?.contact?.email || `${location.name.toLowerCase()}@goetz-rental.de`}`} className="text-brand-teal font-bold hover:underline">
+                                {pageData?.contact?.email || `${location.name.toLowerCase()}@goetz-rental.de`}
                             </a>
                         </div>
                         <div className="text-center md:text-left">
                             <p className="text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Telefon</p>
-                            <a href="tel:+492111234567" className="text-brand-teal font-bold hover:underline">
-                                +49 211 1234567
+                            <a href={`tel:${(pageData?.contact?.phone || "+49 211 1234567").replace(/\s+/g, "")}`} className="text-brand-teal font-bold hover:underline">
+                                {pageData?.contact?.phone || "+49 211 1234567"}
                             </a>
                         </div>
                     </div>
@@ -460,7 +466,7 @@ export default function LocationPage() {
 
             {/* FAQ Section */}
             <FaqSection
-                title={`Häufige Fragen zur Geräte- & Arbeitsbühnenmiete in ${location.name}`}
+                title={pageData?.faq?.title || `Häufige Fragen zur Geräte- & Arbeitsbühnenmiete in ${location.name}`}
                 items={locationFaqs}
             />
 

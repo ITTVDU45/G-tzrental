@@ -19,20 +19,38 @@ const heightRanges = [
     { id: "6-8", label: "6-8m", range: "6-8m", mobileLabel: "6-8m", title: "Low-Level Access", desc: "Kompaktlifte für engste Räume.", price: 75 },
 ];
 
-export function HeightSelector() {
-    const [selectedId, setSelectedId] = useState("18-20");
+interface HeightSelectorProps {
+    content?: {
+        title?: string;
+        subtitle?: string;
+        defaultSelectedId?: string;
+        ranges?: typeof heightRanges;
+        contactCard?: {
+            title?: string;
+            description?: string;
+            phone?: string;
+            email?: string;
+            contactHref?: string;
+            contactLabel?: string;
+        };
+    };
+}
 
-    const selectedRange = heightRanges.find((r) => r.id === selectedId) || heightRanges[5];
+export function HeightSelector({ content }: HeightSelectorProps) {
+    const displayRanges = content?.ranges && content.ranges.length > 0 ? content.ranges : heightRanges;
+    const [selectedId, setSelectedId] = useState(content?.defaultSelectedId || "18-20");
+
+    const selectedRange = displayRanges.find((r) => r.id === selectedId) || displayRanges[5] || displayRanges[0];
 
     return (
         <section id="konfigurator" className="py-24 bg-zinc-50 dark:bg-zinc-900/30">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-5xl font-bold text-brand-dark mb-4">
-                        Wie hoch musst du arbeiten?
+                        {content?.title || "Wie hoch musst du arbeiten?"}
                     </h2>
                     <p className="text-gray-500 max-w-2xl mx-auto">
-                        Wähle deine Arbeitshöhe und wir zeigen dir die passenden Geräte.
+                        {content?.subtitle || "Wähle deine Arbeitshöhe und wir zeigen dir die passenden Geräte."}
                     </p>
                 </div>
 
@@ -45,7 +63,7 @@ export function HeightSelector() {
 
                         {/* Items */}
                         <div className="relative z-10 flex flex-col gap-6 w-full">
-                            {heightRanges.map((range) => {
+                            {displayRanges.map((range) => {
                                 const isActive = range.id === selectedId;
                                 return (
                                     <button
@@ -71,7 +89,7 @@ export function HeightSelector() {
                             onChange={(e) => setSelectedId(e.target.value)}
                             className="w-full p-4 rounded-xl border border-gray-200 bg-white text-lg font-bold shadow-sm"
                         >
-                            {heightRanges.map(r => (
+                            {displayRanges.map(r => (
                                 <option key={r.id} value={r.id}>{r.mobileLabel} Arbeitshöhe</option>
                             ))}
                         </select>
@@ -133,24 +151,24 @@ export function HeightSelector() {
                     {/* Right Content: Static Contact Card */}
                     <div className="lg:col-span-4">
                         <div className="bg-brand-dark text-white rounded-3xl p-8 shadow-2xl sticky top-24">
-                            <h3 className="text-xl font-bold mb-4">Unsicher bei Einsatz oder Höhe?</h3>
+                            <h3 className="text-xl font-bold mb-4">{content?.contactCard?.title || "Unsicher bei Einsatz oder Höhe?"}</h3>
                             <p className="text-white/80 mb-8 leading-relaxed">
-                                Wir prüfen Einsatz, Umfeld und Höhe gemeinsam. Gerne auch direkt bei dir vor Ort.
+                                {content?.contactCard?.description || "Wir prüfen Einsatz, Umfeld und Höhe gemeinsam. Gerne auch direkt bei dir vor Ort."}
                             </p>
 
                             <div className="space-y-4 mb-8">
-                                <a href="tel:+491234567890" className="flex items-center gap-3 hover:text-brand-teal transition-colors">
+                                <a href={`tel:${(content?.contactCard?.phone || "+49 721 123 456").replace(/\s+/g, "")}`} className="flex items-center gap-3 hover:text-brand-teal transition-colors">
                                     <Phone className="w-5 h-5 flex-shrink-0" />
-                                    <span className="font-medium">+49 721 123 456</span>
+                                    <span className="font-medium">{content?.contactCard?.phone || "+49 721 123 456"}</span>
                                 </a>
-                                <a href="mailto:info@goetzrental.de" className="flex items-center gap-3 hover:text-brand-teal transition-colors">
+                                <a href={`mailto:${content?.contactCard?.email || "info@goetzrental.de"}`} className="flex items-center gap-3 hover:text-brand-teal transition-colors">
                                     <Mail className="w-5 h-5 flex-shrink-0" />
-                                    <span className="font-medium">info@goetzrental.de</span>
+                                    <span className="font-medium">{content?.contactCard?.email || "info@goetzrental.de"}</span>
                                 </a>
                             </div>
 
-                            <Link href="/kontakt" className="inline-flex items-center gap-2 text-brand-teal font-bold hover:text-white transition-colors">
-                                Kontaktiere uns <ArrowRight className="w-4 h-4" />
+                            <Link href={content?.contactCard?.contactHref || "/kontakt"} className="inline-flex items-center gap-2 text-brand-teal font-bold hover:text-white transition-colors">
+                                {content?.contactCard?.contactLabel || "Kontaktiere uns"} <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
                     </div>

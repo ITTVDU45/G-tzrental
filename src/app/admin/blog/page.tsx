@@ -15,6 +15,13 @@ interface BlogPost {
     readTime: string;
     status: string;
     pageIds?: string[];
+    categories?: string[];
+}
+
+interface AdminPageOption {
+    id: string;
+    title: string;
+    slug?: string;
 }
 
 export default function AdminBlogPage() {
@@ -22,7 +29,7 @@ export default function AdminBlogPage() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-    const [pages, setPages] = useState<any[]>([]);
+    const [pages, setPages] = useState<AdminPageOption[]>([]);
 
     const fetchPosts = async () => {
         try {
@@ -52,7 +59,7 @@ export default function AdminBlogPage() {
                 <div className="flex items-center gap-4">
                     <div className="w-16 h-10 relative bg-zinc-50 dark:bg-zinc-800 rounded-lg overflow-hidden border border-zinc-100 dark:border-zinc-800 flex-shrink-0">
                         {item.image && typeof item.image === 'string' && (
-                            <Image src={item.image} alt={item.title} fill className="object-cover" />
+                            <Image src={item.image} alt={item.title} fill unoptimized className="object-cover" />
                         )}
                     </div>
                     <span className="font-bold text-zinc-900 dark:text-white line-clamp-1">{item.title}</span>
@@ -61,7 +68,7 @@ export default function AdminBlogPage() {
         },
         {
             header: 'Kategorie',
-            accessor: (item: any) => {
+            accessor: (item: BlogPost) => {
                 const cats = item.categories && item.categories.length > 0 ? item.categories : [item.category].filter(Boolean);
                 return (
                     <div className="flex flex-wrap gap-1">

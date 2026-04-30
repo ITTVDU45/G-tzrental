@@ -63,7 +63,7 @@ export default function AdminCategoriesPage() {
                 <div className="flex items-center gap-4">
                     <div className="w-16 h-10 relative bg-zinc-50 dark:bg-zinc-800 rounded-lg overflow-hidden border border-zinc-100 dark:border-zinc-800">
                         {item.image && typeof item.image === 'string' && (
-                            <Image src={item.image} alt={item.name} fill className="object-cover" />
+                            <Image src={item.image} alt={item.name} fill unoptimized className="object-cover" />
                         )}
                     </div>
                     <span className="font-bold text-zinc-900 dark:text-white">{item.name}</span>

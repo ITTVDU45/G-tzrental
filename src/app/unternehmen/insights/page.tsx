@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Calendar, Clock, ArrowRight, Filter, X } from "lucide-react";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
 import { cn } from "@/lib/utils";
+import { I_Any } from "@/lib/types";
 
 const categories = ["Alle", "Sicherheit", "Ratgeber", "Wartung", "News", "Technik"];
 
@@ -68,17 +69,34 @@ const blogPosts = [
 ];
 
 export default function InsightsPage() {
+    const [pageData, setPageData] = useState<I_Any>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("Alle");
+    const displayCategories = pageData?.filters?.categories || categories;
+    const displayPosts = pageData?.featuredPosts || blogPosts;
+
+    useEffect(() => {
+        const fetchPage = async () => {
+            try {
+                const res = await fetch("/api/cms?type=page_company_insights", { cache: "no-store" });
+                const data = await res.json();
+                setPageData(data);
+            } catch (error) {
+                console.error("Failed to load insights page data", error);
+            }
+        };
+
+        fetchPage();
+    }, []);
 
     const filteredPosts = useMemo(() => {
-        return blogPosts.filter(post => {
+        return displayPosts.filter((post: I_Any) => {
             const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
             const matchesCategory = selectedCategory === "Alle" || post.category === selectedCategory;
             return matchesSearch && matchesCategory;
         });
-    }, [searchQuery, selectedCategory]);
+    }, [displayPosts, searchQuery, selectedCategory]);
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -89,7 +107,7 @@ export default function InsightsPage() {
                         {/* Background Image with Overlay */}
                         <div className="absolute inset-0 bg-black/50 z-10" />
                         <Image
-                            src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=2000"
+                            src={pageData?.hero?.image || "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80&w=2000"}
                             alt="GÖTZ Insights"
                             fill
                             className="object-cover"
@@ -106,13 +124,13 @@ export default function InsightsPage() {
                                     className="max-w-3xl"
                                 >
                                     <span className="inline-block px-4 py-1.5 bg-brand-teal text-white text-xs font-bold uppercase tracking-wider rounded-full mb-6">
-                                        Wissen & News
+                                        {pageData?.hero?.badge || "Wissen & News"}
                                     </span>
                                     <h1 className="text-4xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-lg">
-                                        GÖTZ <span className="text-brand-teal">Insights</span>
+                                        {pageData?.hero?.title ? pageData.hero.title.replace("Insights", "") : "GÖTZ "}<span className="text-brand-teal">{pageData?.hero?.accent || "Insights"}</span>
                                     </h1>
                                     <p className="text-lg md:text-xl text-white/90 leading-relaxed drop-shadow-md max-w-2xl">
-                                        Interessante Experten-Einblicke, aktuellste Branchennews und wertvolle Praxistipps rund um das Thema Arbeitsbühnen und Höhenzugangstechnik.
+                                        {pageData?.hero?.description || "Interessante Experten-Einblicke, aktuellste Branchennews und wertvolle Praxistipps rund um das Thema Arbeitsbühnen und Höhenzugangstechnik."}
                                     </p>
                                 </motion.div>
                             </div>
@@ -151,7 +169,7 @@ export default function InsightsPage() {
                                 <Filter className="w-4 h-4" />
                                 <span className="text-sm font-medium">Kategorien</span>
                             </div>
-                            {categories.map((cat) => (
+                            {displayCategories.map((cat: string) => (
                                 <button
                                     key={cat}
                                     onClick={() => setSelectedCategory(cat)}
@@ -179,7 +197,7 @@ export default function InsightsPage() {
                                 layout
                                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                             >
-                                {filteredPosts.map((post, index) => (
+                                {filteredPosts.map((post: I_Any) => (
                                     <motion.article
                                         key={post.id}
                                         layout

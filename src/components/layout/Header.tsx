@@ -17,10 +17,40 @@ type MenuItem = {
 };
 
 type AdminPageLocation = {
+    id?: string;
     status?: string;
     name?: string;
     slug?: string;
 };
+
+type MenuProduct = {
+    id?: string;
+    name?: string;
+    image?: string;
+    showInMenu?: boolean;
+};
+
+function normalizeLocationSlug(name: string) {
+    return name
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/ä/g, 'ae')
+        .replace(/ö/g, 'oe')
+        .replace(/ü/g, 'ue')
+        .replace(/ß/g, 'ss');
+}
+
+function mapPublishedLocations(data: AdminPageLocation[]) {
+    return data
+        .filter((loc) => loc && loc.status === 'published' && loc.name)
+        .map((loc) => {
+            const name = loc.name ?? "";
+            return {
+                name,
+                slug: normalizeLocationSlug(name),
+            };
+        });
+}
 
 const LiftIcon = ({ className }: { className?: string }) => (
     <svg
@@ -270,6 +300,37 @@ export function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [locations, setLocations] = useState<{ name: string; slug: string }[]>([]);
+    const [menuProducts, setMenuProducts] = useState<MenuProduct[]>([]);
+
+    const loadLocations = async () => {
+        try {
+            const res = await fetch('/api/admin/locations', { cache: 'no-store' });
+            const data = await res.json();
+            if (!Array.isArray(data)) {
+                setLocations([]);
+                return;
+            }
+            setLocations(mapPublishedLocations(data as AdminPageLocation[]));
+        } catch (err) {
+            console.error('Error fetching locations:', err);
+        }
+    };
+
+    useEffect(() => {
+        const fetchMenuProducts = async () => {
+            try {
+                const res = await fetch('/api/admin/products');
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    const shownProducts = (data as MenuProduct[]).filter((p) => p.showInMenu).slice(0, 4);
+                    setMenuProducts(shownProducts);
+                }
+            } catch (err) {
+                console.error('Error fetching menu products:', err);
+            }
+        };
+        fetchMenuProducts();
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -280,40 +341,30 @@ export function Header() {
     }, []);
 
     useEffect(() => {
-        const fetchLocations = async () => {
+        let isMounted = true;
+
+        const initializeLocations = async () => {
             try {
-                const res = await fetch('/api/admin/pages');
+                const res = await fetch('/api/admin/locations', { cache: 'no-store' });
                 const data = await res.json();
+                if (!isMounted) return;
+
                 if (!Array.isArray(data)) {
                     setLocations([]);
                     return;
                 }
-                const excludedSlugs = ['/', '/mieten', '/kontakt', '/unternehmen/ueber-uns'];
-                const publishedLocations = (data as AdminPageLocation[])
-                    .filter((loc) =>
-                        loc &&
-                        loc.status === 'published' &&
-                        loc.name &&
-                        !excludedSlugs.includes(loc.slug)
-                    )
-                    .map((loc) => {
-                        const name = loc.name;
-                        return {
-                            name: name,
-                            slug: name.toLowerCase()
-                                .replace(/\s+/g, '-')
-                                .replace(/ä/g, 'ae')
-                                .replace(/ö/g, 'oe')
-                                .replace(/ü/g, 'ue')
-                                .replace(/ß/g, 'ss')
-                        };
-                    });
-                setLocations(publishedLocations);
+
+                setLocations(mapPublishedLocations(data as AdminPageLocation[]));
             } catch (err) {
                 console.error('Error fetching locations:', err);
             }
         };
-        fetchLocations();
+
+        void initializeLocations();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     return (
@@ -449,7 +500,12 @@ export function Header() {
                                             ease: [0.4, 0, 0.2, 1],
                                         }}
                                         className={cn("group", !item.megaMenu && "relative")}
-                                        onMouseEnter={() => setActiveDropdown(item.name)}
+                                        onMouseEnter={() => {
+                                            if (item.name === "Standorte") {
+                                                void loadLocations();
+                                            }
+                                            setActiveDropdown(item.name);
+                                        }}
                                         onMouseLeave={() => setActiveDropdown(null)}
                                     >
                                         <motion.div
@@ -485,79 +541,45 @@ export function Header() {
                                                     className="absolute top-full left-0 right-0 mt-4 bg-white dark:bg-zinc-900 rounded-[3rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] border border-zinc-100 dark:border-zinc-800 overflow-hidden"
                                                 >
                                                     <div className="p-10">
-                                                        <div className="flex gap-12">
-                                                            {/* Categories Grid - 4 Columns */}
-                                                            <div className="flex-grow grid grid-cols-4 gap-8">
-                                                                {megaMenuCategories.map((category, catIndex) => (
-                                                                    <motion.div
-                                                                        key={category.title}
-                                                                        initial={{ opacity: 0, y: 10 }}
-                                                                        animate={{ opacity: 1, y: 0 }}
-                                                                        transition={{ delay: catIndex * 0.05 }}
-                                                                    >
-                                                                        <Link
-                                                                            href={`/mieten/${category.title.toLowerCase()}`}
-                                                                            className="group/cat flex items-center gap-2 text-base font-bold text-brand-dark dark:text-white mb-6 hover:text-brand-teal transition-colors"
-                                                                        >
-                                                                            {category.title}
-                                                                            <ArrowRight className="w-4 h-4 text-brand-teal group-hover/cat:translate-x-1 transition-transform" />
-                                                                        </Link>
-                                                                        <ul className="space-y-3">
-                                                                            {category.items.map((subItem) => (
-                                                                                <li key={subItem}>
-                                                                                    <Link
-                                                                                        href={`/mieten/${subItem.toLowerCase().replace(/\s+/g, '-')}`}
-                                                                                        className="text-[15px] text-zinc-500 dark:text-zinc-400 hover:text-brand-teal dark:hover:text-brand-teal transition-all block py-0.5 hover:translate-x-1 duration-200"
-                                                                                    >
-                                                                                        {subItem}
-                                                                                    </Link>
-                                                                                </li>
-                                                                            ))}
-                                                                        </ul>
-                                                                    </motion.div>
-                                                                ))}
-                                                            </div>
-
-                                                            {/* Featured Section - Right Side */}
-                                                            <div className="w-[320px] space-y-4">
-                                                                {featuredProducts.map((product, prodIndex) => (
-                                                                    <motion.div
-                                                                        key={product.title}
-                                                                        initial={{ opacity: 0, scale: 0.95 }}
-                                                                        animate={{ opacity: 1, scale: 1 }}
-                                                                        transition={{ delay: 0.2 + (prodIndex * 0.1) }}
-                                                                    >
-                                                                        <Link
-                                                                            href={product.link}
-                                                                            className="group block relative h-[140px] rounded-3xl overflow-hidden"
-                                                                        >
-                                                                            <Image
-                                                                                src={product.image}
-                                                                                alt={product.title}
-                                                                                fill
-                                                                                className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                                                            />
-                                                                            {/* Gradient Overlay as in image */}
-                                                                            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
-                                                                            <div className="absolute inset-0 flex items-center px-6">
-                                                                                <h4 className="text-white text-lg font-bold flex items-center gap-2 group-hover:gap-3 transition-all">
-                                                                                    {product.title}
-                                                                                    <ArrowRight className="w-5 h-5" />
-                                                                                </h4>
-                                                                            </div>
-                                                                        </Link>
-                                                                    </motion.div>
-                                                                ))}
-
-                                                                {/* Full Rental Park CTA */}
-                                                                <Link
-                                                                    href="/mieten"
-                                                                    className="flex items-center justify-center gap-3 px-6 py-5 bg-[#002B2B] text-white rounded-[1.5rem] font-bold text-base hover:bg-brand-teal transition-all group shadow-lg"
+                                                        <div className="mb-6 flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                                                            <h3 className="text-xl font-black text-zinc-900 dark:text-white uppercase tracking-tight">Scherenbühnen Mieten</h3>
+                                                            <Link href="/mieten" className="text-sm font-bold text-brand-teal hover:underline flex items-center gap-1">
+                                                                Alle anzeigen <ArrowRight className="w-4 h-4" />
+                                                            </Link>
+                                                        </div>
+                                                        <div className="grid grid-cols-4 gap-6">
+                                                            {menuProducts.map((product, prodIndex) => (
+                                                                <motion.div
+                                                                    key={product.id || prodIndex}
+                                                                    initial={{ opacity: 0, scale: 0.95 }}
+                                                                    animate={{ opacity: 1, scale: 1 }}
+                                                                    transition={{ delay: prodIndex * 0.05 }}
                                                                 >
-                                                                    <span>Vollständiger Mietpark</span>
-                                                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                                                </Link>
-                                                            </div>
+                                                                    <Link
+                                                                        href={`/mieten/geraet/${product.id}`}
+                                                                        className="group block relative h-[180px] rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-zinc-100 dark:border-zinc-800"
+                                                                    >
+                                                                        <Image
+                                                                            src={product.image || "https://images.unsplash.com/photo-1581094794329-cd132ad97c55?auto=format&fit=crop&q=80&w=400"}
+                                                                            alt={product.name}
+                                                                            fill
+                                                                            className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                                                        />
+                                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                                                                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                                                                            <h4 className="text-white text-base font-bold flex flex-col gap-1">
+                                                                                <span className="leading-tight">{product.name}</span>
+                                                                                <span className="text-xs text-zinc-300 font-medium flex items-center gap-1 mt-1">
+                                                                                    Mieten <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                                                                </span>
+                                                                            </h4>
+                                                                        </div>
+                                                                    </Link>
+                                                                </motion.div>
+                                                            ))}
+                                                            {menuProducts.length === 0 && (
+                                                                <div className="col-span-4 py-8 text-center text-zinc-500 font-medium">Keine Produkte für das Menü ausgewählt. Bitte im Admin-Bereich aktivieren.</div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </motion.div>
@@ -795,6 +817,20 @@ export function Header() {
                                             >
                                                 {item.name}
                                             </Link>
+                                            {item.name === "Standorte" && locations.length > 0 && (
+                                                <div className="ml-4 flex flex-col gap-1">
+                                                    {locations.map((location) => (
+                                                        <Link
+                                                            key={location.slug}
+                                                            href={`/standorte/${location.slug}`}
+                                                            className="text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-brand-teal px-4 py-1 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all"
+                                                            onClick={() => setMobileMenuOpen(false)}
+                                                        >
+                                                            {location.name}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                     <div className="flex gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">

@@ -34,23 +34,25 @@ const slides = [
 
 interface HeroCarouselProps {
     onExploreClick?: () => void;
+    items?: typeof slides;
 }
 
-export function HeroCarousel({ onExploreClick }: HeroCarouselProps) {
+export function HeroCarousel({ onExploreClick, items }: HeroCarouselProps) {
+    const displaySlides = items && items.length > 0 ? items : slides;
     const [current, setCurrent] = useState(0);
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setCurrent((prev) => (prev + 1) % slides.length);
+            setCurrent((prev) => (prev + 1) % displaySlides.length);
         }, 6000);
         return () => clearInterval(timer);
-    }, []);
+    }, [displaySlides.length]);
 
-    const nextSlide = () => setCurrent((prev) => (prev + 1) % slides.length);
-    const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+    const nextSlide = () => setCurrent((prev) => (prev + 1) % displaySlides.length);
+    const prevSlide = () => setCurrent((prev) => (prev - 1 + displaySlides.length) % displaySlides.length);
 
     // Fallback to avoid runtime crash if state is temporarily invalid
-    const activeSlide = slides[current] || slides[0];
+    const activeSlide = displaySlides[current] || displaySlides[0];
 
     return (
         <section className="bg-zinc-50 pt-6 pb-6 md:pt-8 md:pb-8 lg:pt-8 dark:bg-zinc-900/30">
@@ -131,7 +133,7 @@ export function HeroCarousel({ onExploreClick }: HeroCarouselProps) {
 
                     {/* Indicators */}
                     <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-2">
-                        {slides.map((_, index) => (
+                        {displaySlides.map((_, index) => (
                             <button
                                 key={index}
                                 onClick={() => setCurrent(index)}

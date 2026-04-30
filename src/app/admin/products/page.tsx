@@ -11,6 +11,7 @@ interface Product {
     category: string;
     subcategory: string;
     image: string;
+    gallery?: string[];
     description: string;
     insuranceText?: string;
     insuranceBadges?: { id: string; text: string }[];
@@ -18,12 +19,16 @@ interface Product {
     datasheet?: string;
     datasheetName?: string;
     documents?: { id: string; name: string; url: string }[];
-    details: any;
+    details: Record<string, unknown>;
+}
+
+interface CategoryOption {
+    name: string;
 }
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
-    const [categories, setCategories] = useState<any[]>([]);
+    const [categories, setCategories] = useState<CategoryOption[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -75,7 +80,7 @@ export default function AdminProductsPage() {
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 relative bg-zinc-50 dark:bg-zinc-800 rounded-xl overflow-hidden border border-zinc-100 dark:border-zinc-800">
                         {item.image && typeof item.image === 'string' && (
-                            <Image src={item.image} alt={item.name} fill className="object-contain p-1" />
+                            <Image src={item.image} alt={item.name} fill unoptimized className="object-contain p-1" />
                         )}
                     </div>
                     <span className="font-bold text-zinc-900 dark:text-white">{item.name}</span>
@@ -126,13 +131,16 @@ export default function AdminProductsPage() {
                 loading={loading}
             />
 
-            <ProductModal
-                isOpen={isModalOpen}
-                onCloseAction={() => setIsModalOpen(false)}
-                onSaveAction={handleSave}
-                product={selectedProduct}
-                categories={categories.map(c => c.name)}
-            />
+            {isModalOpen && (
+                <ProductModal
+                    key={selectedProduct?.id || 'new-product'}
+                    isOpen={isModalOpen}
+                    onCloseAction={() => setIsModalOpen(false)}
+                    onSaveAction={handleSave}
+                    product={selectedProduct}
+                    categories={categories.map(c => c.name)}
+                />
+            )}
         </div>
     );
 }

@@ -1,14 +1,12 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
-import { readDb } from '@/lib/db';
+import { COLLECTIONS, countCollection } from '@/lib/mongo-admin';
+import { products as mockProducts } from '@/data/mockProducts';
 import {
     FileText,
-    Layers,
     Box,
     MessageSquare,
     BookOpen,
-    ArrowUpRight,
-    TrendingUp,
     Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,14 +15,20 @@ export default async function AdminDashboard() {
     const session = await getSession();
     if (!session) redirect('/admin/login');
 
-    const db = await readDb();
+    const [inquiriesCount, pagesCount, productsCount, testimonialsCount, blogCount] = await Promise.all([
+        countCollection(COLLECTIONS.inquiries, "inquiries"),
+        countCollection(COLLECTIONS.pages, "pages"),
+        countCollection(COLLECTIONS.products, "products", mockProducts),
+        countCollection(COLLECTIONS.testimonials, "testimonials"),
+        countCollection(COLLECTIONS.blog, "blog"),
+    ]);
 
     const stats = [
-        { title: 'Anfragen', value: db.inquiries?.length || 0, icon: MessageSquare, color: 'text-red-500', bg: 'bg-red-500/10' },
-        { title: 'Seiten', value: db.pages?.length || 0, icon: FileText, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-        { title: 'Produkte', value: db.products?.length || 0, icon: Box, color: 'text-brand-teal', bg: 'bg-brand-teal/10' },
-        { title: 'Testimonials', value: db.testimonials?.length || 0, icon: MessageSquare, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-        { title: 'Blog-Posts', value: db.blog?.length || 0, icon: BookOpen, color: 'text-pink-500', bg: 'bg-pink-500/10' },
+        { title: 'Anfragen', value: inquiriesCount, icon: MessageSquare, color: 'text-red-500', bg: 'bg-red-500/10' },
+        { title: 'Seiten', value: pagesCount, icon: FileText, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { title: 'Produkte', value: productsCount, icon: Box, color: 'text-brand-teal', bg: 'bg-brand-teal/10' },
+        { title: 'Testimonials', value: testimonialsCount, icon: MessageSquare, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+        { title: 'Blog-Posts', value: blogCount, icon: BookOpen, color: 'text-pink-500', bg: 'bg-pink-500/10' },
     ];
 
     return (

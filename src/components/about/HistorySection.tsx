@@ -13,8 +13,15 @@ const historyEvents = [
     { year: "Heute", title: "Alles aus einer Hand", description: "Über 7.500 Mietgeräte europaweit verfügbar." },
 ];
 
-export function HistorySection() {
+interface HistorySectionProps {
+    title?: string;
+    subtitle?: string;
+    items?: typeof historyEvents;
+}
+
+export function HistorySection({ title, subtitle, items }: HistorySectionProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
+    const displayItems = items && items.length > 0 ? items : historyEvents;
 
     const scroll = (direction: 'left' | 'right') => {
         if (scrollRef.current) {
@@ -28,8 +35,8 @@ export function HistorySection() {
         <section className="py-24 overflow-hidden bg-zinc-50 dark:bg-zinc-900/50">
             <div className="container mx-auto px-6 mb-12 flex items-end justify-between">
                 <div>
-                    <h2 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-4">Die Geschichte</h2>
-                    <p className="text-zinc-500">Von 2014 bis heute – eine Erfolgsstory.</p>
+                    <h2 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-4">{title || "Die Geschichte"}</h2>
+                    <p className="text-zinc-500">{subtitle || "Von 2014 bis heute – eine Erfolgsstory."}</p>
                 </div>
 
                 <div className="flex gap-2">
@@ -47,7 +54,7 @@ export function HistorySection() {
                 className="flex gap-6 overflow-x-auto px-6 pb-12 scrollbar-hide snap-x"
             >
                 <div className="w-6 shrink-0" /> {/* Spacer */}
-                {historyEvents.map((event, i) => (
+                {displayItems.map((event, i) => (
                     <div key={i} className="snap-center shrink-0 w-[400px] h-[300px] relative rounded-[2rem] bg-white dark:bg-zinc-900 p-8 shadow-xl border border-zinc-100 dark:border-zinc-800 flex flex-col justify-between group hover:-translate-y-2 transition-transform duration-300">
                         <div>
                             <span className="text-6xl font-black text-zinc-100 dark:text-zinc-800 absolute top-6 right-8 select-none z-0">

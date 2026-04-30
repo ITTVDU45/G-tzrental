@@ -7,12 +7,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     ChevronRight,
     ChevronDown,
-    ArrowLeft,
     ArrowRight,
     Download,
     Info,
     ShieldCheck,
-    CheckCircle2,
     LayoutGrid,
     Truck,
     Clock,
@@ -20,25 +18,32 @@ import {
     Calendar,
     Send,
     FileEdit,
-    Plus,
-    Minus,
-    MessageSquare,
     Zap,
     Scale,
     Gem,
-    ChevronLeft
+    ChevronLeft,
+    Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ProductInquiryModal from "./ProductInquiryModal";
+import { I_Any } from "@/lib/types";
 
 interface ProductTemplateProps {
-    product: any;
-    alternatives: any[];
+    product: I_Any;
+    alternatives: I_Any[];
 }
 
 export default function ProductTemplate({ product, alternatives }: ProductTemplateProps) {
     const [activeAccordion, setActiveAccordion] = useState<string | null>("description");
     const [showInquiryModal, setShowInquiryModal] = useState(false);
+    const [showImageZoom, setShowImageZoom] = useState(false);
+    const galleryImages = Array.from(
+        new Set(
+            [product.image, ...(Array.isArray(product.gallery) ? product.gallery : [])]
+                .filter((image): image is string => typeof image === "string" && image.length > 0)
+        )
+    );
+    const [activeImage, setActiveImage] = useState<string>(galleryImages[0] || product.image || "");
 
     return (
         <div className="min-h-screen bg-white dark:bg-zinc-950 pt-32 pb-24">
@@ -56,29 +61,68 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                     {/* Left Column - Images & Details */}
                     <div className="lg:col-span-7 space-y-12">
                         {/* Hero Section */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="relative aspect-[4/5] bg-zinc-50 dark:bg-zinc-900 rounded-[2.5rem] overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm">
-                                {product.image && typeof product.image === 'string' && (
+                        <div className="space-y-6">
+                            <button
+                                type="button"
+                                onClick={() => activeImage && setShowImageZoom(true)}
+                                className="group relative block w-full aspect-[16/11] bg-zinc-50 dark:bg-zinc-900 rounded-[2.5rem] overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm"
+                            >
+                                {activeImage ? (
                                     <Image
-                                        src={product.image}
+                                        src={activeImage}
                                         alt={product.name}
                                         fill
-                                        className="object-contain p-8"
+                                        className="object-contain p-6 md:p-8 transition-transform duration-500 group-hover:scale-105"
                                         priority
                                     />
+                                ) : (
+                                    <div className="flex h-full items-center justify-center text-xs font-bold uppercase tracking-widest text-zinc-400">
+                                        Kein Bild verfügbar
+                                    </div>
                                 )}
-                            </div>
-                            <div className="flex flex-col gap-4">
-                                <div className="aspect-square relative bg-zinc-50 dark:bg-zinc-900 rounded-[2rem] overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                                    {product.image && typeof product.image === 'string' && (
-                                        <Image src={product.image} alt="Detail 1" fill className="object-contain p-6 opacity-50" />
-                                    )}
-                                </div>
-                                <div className="aspect-square relative bg-zinc-50 dark:bg-zinc-900 rounded-[2rem] overflow-hidden border border-zinc-100 dark:border-zinc-800">
-                                    {product.image && typeof product.image === 'string' && (
-                                        <Image src={product.image} alt="Detail 2" fill className="object-contain p-6 opacity-30 grayscale" />
-                                    )}
-                                </div>
+                                {activeImage && (
+                                    <div className="absolute right-5 top-5 flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-black uppercase tracking-widest text-zinc-900 shadow-lg transition-all group-hover:bg-brand-teal group-hover:text-white">
+                                        <Search className="h-4 w-4" />
+                                        Lupe
+                                    </div>
+                                )}
+                            </button>
+
+                            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+                                {galleryImages.length > 0 ? (
+                                    galleryImages.map((img: string, idx: number) => (
+                                        <button
+                                            key={`${img}-${idx}`}
+                                            type="button"
+                                            onClick={() => setActiveImage(img)}
+                                            className={cn(
+                                                "group relative aspect-square flex-shrink-0 bg-zinc-50 dark:bg-zinc-900 rounded-[2rem] overflow-hidden border transition-all",
+                                                activeImage === img
+                                                    ? "border-brand-teal ring-2 ring-brand-teal/20 shadow-lg"
+                                                    : "border-zinc-100 dark:border-zinc-800 hover:border-brand-teal/40"
+                                            )}
+                                        >
+                                            <Image
+                                                src={img}
+                                                alt={`${product.name} Galerie ${idx + 1}`}
+                                                fill
+                                                className={cn(
+                                                    "object-contain p-5 transition-all duration-300 group-hover:scale-105",
+                                                    activeImage === img ? "opacity-100" : "opacity-80"
+                                                )}
+                                            />
+                                            <div className="absolute inset-x-0 bottom-0 flex justify-end p-3 opacity-0 transition-opacity group-hover:opacity-100">
+                                                <span className="rounded-full bg-white/90 p-2 text-zinc-900 shadow-md">
+                                                    <Search className="h-4 w-4" />
+                                                </span>
+                                            </div>
+                                        </button>
+                                    ))
+                                ) : (
+                                    <div className="col-span-2 flex aspect-[2/1] items-center justify-center rounded-[2rem] border border-dashed border-zinc-200 bg-zinc-50 text-xs font-bold uppercase tracking-widest text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900">
+                                        Keine Galerie-Bilder vorhanden
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -103,26 +147,23 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                             >
                                 <div className="space-y-4">
                                     <p className="text-zinc-600 dark:text-zinc-400">
-                                        {product.insuranceText || "Standard Maschinenbruchversicherung inklusive."}
+                                        {product.insuranceText || "Standard Maschinenbruchversicherung inklusive. Sorglos mieten mit unserem Rundum-Schutzpaket."}
                                     </p>
-                                    <div className="flex flex-col gap-3">
-                                        {product.insuranceBadges && product.insuranceBadges.length > 0 ? (
-                                            product.insuranceBadges.map((badge: { id: string, text: string }) => (
-                                                <div key={badge.id} className="flex items-center gap-3 p-4 bg-brand-teal/10 rounded-2xl border border-brand-teal/20 text-brand-dark dark:text-brand-teal">
-                                                    <ShieldCheck className="w-5 h-5 flex-shrink-0" />
-                                                    <p className="text-sm font-medium">{badge.text}</p>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="flex items-center gap-3 p-4 bg-brand-teal/10 rounded-2xl border border-brand-teal/20 text-brand-dark dark:text-brand-teal">
-                                                <ShieldCheck className="w-5 h-5 flex-shrink-0" />
-                                                <p className="text-sm font-medium">Sorglos mieten mit unserem Rundum-Schutzpaket.</p>
-                                            </div>
-                                        )}
-                                    </div>
                                 </div>
                             </AccordionItem>
                         </div>
+                        
+                        {/* Insurance Badges displayed below accordions */}
+                        {product.insuranceBadges && product.insuranceBadges.length > 0 && (
+                            <div className="flex flex-wrap gap-2 pt-2" suppressHydrationWarning>
+                                {product.insuranceBadges.map((badge: { id: string, text: string }) => (
+                                    <span key={badge.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-bold whitespace-nowrap" suppressHydrationWarning>
+                                        <ShieldCheck className="w-3.5 h-3.5 text-brand-teal" />
+                                        {badge.text}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
 
                     </div>
 
@@ -257,14 +298,14 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                                 </div>
                             ))
                         ) : product.fullSpecs ? (
-                            Object.entries(product.fullSpecs).map(([key, value]: [string, any]) => (
+                            Object.entries(product.fullSpecs).map(([key, value]: [string, I_Any]) => (
                                 <div key={key} className="flex justify-between py-4 border-b border-zinc-50 dark:border-zinc-900 group">
                                     <span className="text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors">{key}</span>
                                     <span className="font-bold text-zinc-900 dark:text-white group-hover:text-brand-teal transition-colors">{value}</span>
                                 </div>
                             ))
                         ) : product.details ? (
-                            Object.entries(product.details).map(([key, value]: [string, any]) => {
+                            Object.entries(product.details).map(([key, value]: [string, I_Any]) => {
                                 // Simple mapping for legacy details object
                                 const labelMap: Record<string, string> = {
                                     height: "Arbeitshöhe",
@@ -288,7 +329,7 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                 {/* How it Works Section */}
                 <div className="mt-24 pt-24 border-t border-zinc-100 dark:border-zinc-800">
                     <h2 className="text-3xl md:text-5xl font-black text-zinc-900 dark:text-white mb-16 uppercase">
-                        {product.name} mieten - so funktioniert's
+                        {product.name} mieten - so funktioniert&apos;s
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -358,7 +399,7 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                                 Umfangreiche Services rund um Technik
                             </h3>
                             <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                                Bei uns bekommst du mehr als "nur" Vermietung und Verkauf: Unsere umfassenden Services umfassen professionelle Schulungen, regelmäßige UVV-Prüfungen sowie zuverlässige Wartungs- und Reparaturservices durch unser qualifiziertes Technikerteam.
+                                Bei uns bekommst du mehr als &quot;nur&quot; Vermietung und Verkauf: Unsere umfassenden Services umfassen professionelle Schulungen, regelmäßige UVV-Prüfungen sowie zuverlässige Wartungs- und Reparaturservices durch unser qualifiziertes Technikerteam.
                             </p>
                         </div>
                     </div>
@@ -452,12 +493,47 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                 onClose={() => setShowInquiryModal(false)}
                 product={product}
             />
+
+            <AnimatePresence>
+                {showImageZoom && activeImage && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm"
+                        onClick={() => setShowImageZoom(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.92, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.92, opacity: 0 }}
+                            className="relative h-[85vh] w-full max-w-6xl overflow-hidden rounded-[2.5rem] bg-white dark:bg-zinc-950"
+                            onClick={(event) => event.stopPropagation()}
+                        >
+                            <button
+                                type="button"
+                                onClick={() => setShowImageZoom(false)}
+                                className="absolute right-5 top-5 z-10 rounded-full bg-black/70 px-4 py-2 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-brand-teal"
+                            >
+                                Schließen
+                            </button>
+                            <Image
+                                src={activeImage}
+                                alt={product.name}
+                                fill
+                                className="object-contain p-6"
+                                priority
+                            />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
 
 // Helper Components
-function AccordionItem({ title, id, children, isOpen, onToggle }: { title: string, id: string, children: React.ReactNode, isOpen: boolean, onToggle: () => void }) {
+function AccordionItem({ title, children, isOpen, onToggle }: { title: string, children: React.ReactNode, isOpen: boolean, onToggle: () => void }) {
     return (
         <div className="border border-zinc-100 dark:border-zinc-800 rounded-[2rem] overflow-hidden bg-white dark:bg-zinc-900/50 shadow-sm">
             <button
@@ -520,10 +596,10 @@ function StepItem({ number, title, description, icon }: { number: string, title:
     );
 }
 
-function AlternativesList({ alternatives }: { alternatives: any[] }) {
+function AlternativesList({ alternatives }: { alternatives: I_Any[] }) {
     return (
         <>
-            {alternatives.map((product: any) => (
+            {alternatives.map((product: I_Any) => (
                 <div
                     key={product.id}
                     className="flex-shrink-0 w-[350px] snap-start group relative bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] dark:from-zinc-800 dark:to-zinc-900 rounded-[2.5rem] overflow-hidden hover:shadow-2xl transition-all duration-500 border border-zinc-100 dark:border-zinc-800 flex flex-col"

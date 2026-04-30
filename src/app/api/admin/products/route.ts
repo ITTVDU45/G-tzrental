@@ -1,56 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { readDb, writeDb } from '@/lib/db';
-import { getSession } from '@/lib/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { COLLECTIONS, deleteByBusinessId, listSeededCollection, seedProducts, upsertByBusinessId } from "@/lib/mongo-admin";
+import { products as mockProducts } from "@/data/mockProducts";
 
 export async function GET() {
-    const db = await readDb();
-    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
-
-    // Seed if empty
-    if (!db.products || db.products.length === 0) {
-        const { products } = require('@/data/mockProducts');
-        db.products = products;
-        await writeDb(db);
-    }
-
-    return NextResponse.json(db.products || []);
+    const products = await listSeededCollection(COLLECTIONS.products, "products", mockProducts);
+    return NextResponse.json(products);
 }
 
 export async function POST(req: NextRequest) {
     const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    await seedProducts();
     const product = await req.json();
-    const db = await readDb();
-    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    const saved = await upsertByBusinessId(
+        COLLECTIONS.products,
+        product,
+        () => Math.random().toString(36).slice(2, 11)
+    );
 
-    if (product.id) {
-        // Update
-        const idx = db.products.findIndex((p: any) => p.id === product.id);
-        if (idx !== -1) {
-            db.products[idx] = product;
-        } else {
-            db.products.push(product);
-        }
-    } else {
-        // Create
-        product.id = Math.random().toString(36).substr(2, 9);
-        db.products.push(product);
-    }
-
-    await writeDb(db);
-    return NextResponse.json(product);
+    return NextResponse.json(saved);
 }
 
 export async function DELETE(req: NextRequest) {
     const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await req.json();
-    const db = await readDb();
-    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
-
-    db.products = db.products.filter((p: any) => p.id !== id);
-    await writeDb(db);
+    await deleteByBusinessId(COLLECTIONS.products, id);
     return NextResponse.json({ success: true });
 }

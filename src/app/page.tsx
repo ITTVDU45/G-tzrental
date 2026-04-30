@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { CategorySlider } from "@/components/home/CategorySlider";
 import { FeatureSection } from "@/components/home/FeatureSection";
@@ -13,22 +13,51 @@ import { FaqSection } from "@/components/home/FaqSection";
 import { BlogSection } from "@/components/home/BlogSection";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
 import { ProductSelector } from "@/components/products/ProductSelector";
+import { I_Any } from "@/lib/types";
 
 export default function Home() {
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [pageData, setPageData] = useState<I_Any>(null);
+
+  useEffect(() => {
+    const fetchPage = async () => {
+      try {
+        const res = await fetch("/api/cms?type=page_home", { cache: "no-store" });
+        const data = await res.json();
+        setPageData(data);
+      } catch (error) {
+        console.error("Failed to load home page data", error);
+      }
+    };
+
+    fetchPage();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
-      <HeroCarousel onExploreClick={() => setIsSelectorOpen(true)} />
+      <HeroCarousel
+        onExploreClick={() => setIsSelectorOpen(true)}
+        items={pageData?.hero?.slides}
+      />
       <CategorySlider />
-      <FeatureSection onCtaClick={() => setIsSelectorOpen(true)} />
-      <HeightSelector />
+      <FeatureSection
+        onCtaClick={() => setIsSelectorOpen(true)}
+        content={pageData?.featureSection}
+      />
+      <HeightSelector content={pageData?.heightSelector} />
       <ProductGridSection />
-      <LargeProductCarousel />
+      <LargeProductCarousel
+        title={pageData?.highlightCarousel?.title}
+        items={pageData?.highlightCarousel?.items}
+      />
       <CtaSection />
-      <TestimonialsSection pageId="page-1" />
-      <FaqSection />
-      <BlogSection pageId="page-1" />
+      <TestimonialsSection pageId={pageData?.references?.pageId || "page-1"} />
+      <FaqSection
+        title={pageData?.faq?.title}
+        subtitle={pageData?.faq?.subtitle}
+        items={pageData?.faq?.items}
+      />
+      <BlogSection pageId={pageData?.references?.pageId || "page-1"} />
       <FinalCtaSection />
 
       <ProductSelector

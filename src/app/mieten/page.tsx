@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronRight, Filter, ArrowUpDown, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { BlogSection } from "@/components/home/BlogSection";
+import { I_Any } from "@/lib/types";
 
 // Static meta info (could also be dynamic later)
 const pageMeta = {
@@ -15,23 +16,27 @@ const pageMeta = {
 };
 
 export default function AllProductsPage() {
-    const [products, setProducts] = useState<any[]>([]);
-    const [categories, setCategories] = useState<any[]>([]);
+    const [products, setProducts] = useState<I_Any[]>([]);
+    const [categories, setCategories] = useState<I_Any[]>([]);
+    const [pageData, setPageData] = useState<I_Any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [prodRes, catRes] = await Promise.all([
+                const [prodRes, catRes, pageRes] = await Promise.all([
                     fetch('/api/admin/products'),
-                    fetch('/api/admin/categories')
+                    fetch('/api/admin/categories'),
+                    fetch('/api/cms?type=page_rental_overview', { cache: 'no-store' })
                 ]);
-                const [prodData, catData] = await Promise.all([
+                const [prodData, catData, page] = await Promise.all([
                     prodRes.json(),
-                    catRes.json()
+                    catRes.json(),
+                    pageRes.json()
                 ]);
                 setProducts(prodData);
                 setCategories(catData);
+                setPageData(page);
             } catch (err) {
                 console.error(err);
             } finally {
@@ -61,7 +66,7 @@ export default function AllProductsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-4 tracking-tight"
                 >
-                    {pageMeta.title}
+                    {pageData?.hero?.title || pageMeta.title}
                 </motion.h1>
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
@@ -69,7 +74,7 @@ export default function AllProductsPage() {
                     transition={{ delay: 0.1 }}
                     className="text-lg text-zinc-500 max-w-2xl mb-12"
                 >
-                    {pageMeta.description}
+                    {pageData?.hero?.description || pageMeta.description}
                 </motion.p>
 
                 {/* Categories Horizontal Scroll */}

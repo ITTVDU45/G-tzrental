@@ -1,76 +1,85 @@
-import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
-import { getSession } from '@/lib/auth';
+import { NextRequest, NextResponse } from "next/server";
+import path from "path";
+import { getSession } from "@/lib/auth";
+import { deleteMediaObject, listMediaObjects, uploadMediaObject } from "@/lib/minio";
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public/uploads');
+function sanitizeFileName(fileName: string) {
+    const extension = path.extname(fileName);
+    const baseName = path.basename(fileName, extension);
 
-// Ensure upload directory exists
-async function ensureUploadDir() {
-    try {
-        await fs.access(UPLOAD_DIR);
-    } catch {
-        await fs.mkdir(UPLOAD_DIR, { recursive: true });
-    }
+    const safeBaseName = baseName
+        .normalize("NFKD")
+        .replace(/[^\w.-]+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "")
+        .toLowerCase();
+
+    const safeExtension = extension.replace(/[^\w.]/g, "").toLowerCase();
+
+    return `${Date.now()}-${safeBaseName || "file"}${safeExtension}`;
 }
 
 export async function GET() {
     const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    await ensureUploadDir();
-    const files = await fs.readdir(UPLOAD_DIR);
-
-    const media = files.map(file => ({
-        name: file,
-        url: `/uploads/${file}`,
-        size: 0, // Could get actual size if needed
-        type: path.extname(file).slice(1)
-    })).filter(item => ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg', 'pdf'].includes(item.type.toLowerCase()));
-
-    return NextResponse.json(media);
+    try {
+        const media = await listMediaObjects();
+        return NextResponse.json(media);
+    } catch (error) {
+        console.error("Media list error:", error);
+        return NextResponse.json({ error: "Media listing failed" }, { status: 500 });
+    }
 }
 
 export async function POST(req: NextRequest) {
     const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     try {
         const formData = await req.formData();
-        const file = formData.get('file') as File;
+        const file = formData.get("file");
 
-        if (!file) {
-            return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+        if (!(file instanceof File)) {
+            return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
         }
 
         const buffer = Buffer.from(await file.arrayBuffer());
-        const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-        const filePath = path.join(UPLOAD_DIR, fileName);
-
-        await ensureUploadDir();
-        await fs.writeFile(filePath, buffer);
+        const fileName = sanitizeFileName(file.name);
+        const uploaded = await uploadMediaObject(fileName, buffer, file.type);
 
         return NextResponse.json({
             success: true,
-            url: `/uploads/${fileName}`,
-            name: fileName
+            url: uploaded.url,
+            name: uploaded.name,
         });
     } catch (error) {
-        console.error('Upload error:', error);
-        return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+        console.error("Upload error:", error);
+        return NextResponse.json({ error: "Upload failed" }, { status: 500 });
     }
 }
 
 export async function DELETE(req: NextRequest) {
     const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     try {
         const { name } = await req.json();
-        const filePath = path.join(UPLOAD_DIR, name);
-        await fs.unlink(filePath);
+
+        if (typeof name !== "string" || !name.trim()) {
+            return NextResponse.json({ error: "Missing file name" }, { status: 400 });
+        }
+
+        await deleteMediaObject(name);
         return NextResponse.json({ success: true });
     } catch (error) {
-        return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
+        console.error("Delete error:", error);
+        return NextResponse.json({ error: "Delete failed" }, { status: 500 });
     }
 }

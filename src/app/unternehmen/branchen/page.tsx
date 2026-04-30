@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,6 +8,7 @@ import { ArrowRight, Building2, Truck, Trees, Zap, Warehouse, Music } from "luci
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
 import { BlogSection } from "@/components/home/BlogSection";
 import { FaqSection } from "@/components/home/FaqSection";
+import { I_Any } from "@/lib/types";
 
 const industries = [
     {
@@ -60,6 +62,23 @@ const industries = [
 ];
 
 export default function IndustriesPage() {
+    const [pageData, setPageData] = useState<I_Any>(null);
+    const displayIndustries = pageData?.industries && pageData.industries.length > 0 ? pageData.industries : industries;
+
+    useEffect(() => {
+        const fetchPage = async () => {
+            try {
+                const res = await fetch("/api/cms?type=page_company_industries", { cache: "no-store" });
+                const data = await res.json();
+                setPageData(data);
+            } catch (error) {
+                console.error("Failed to load industries page data", error);
+            }
+        };
+
+        fetchPage();
+    }, []);
+
     return (
         <div className="min-h-screen bg-white dark:bg-zinc-950 pt-24">
             {/* Hero Section (Card Style) */}
@@ -69,7 +88,7 @@ export default function IndustriesPage() {
                         {/* Background Image with Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-r from-zinc-900/90 to-zinc-900/20 z-10" />
                         <Image
-                            src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=2000"
+                            src={pageData?.hero?.image || "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=2000"}
                             alt="Industries Hero"
                             fill
                             className="object-cover"
@@ -85,14 +104,13 @@ export default function IndustriesPage() {
                                     className="max-w-3xl"
                                 >
                                     <span className="inline-block px-4 py-2 rounded-full bg-brand-lime/20 text-brand-lime border border-brand-lime/30 font-bold mb-6 backdrop-blur-sm">
-                                        Branchenlösungen
+                                        {pageData?.hero?.badge || "Branchenlösungen"}
                                     </span>
                                     <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
-                                        Für jeden Einsatz <br />
-                                        <span className="text-brand-teal">das passende Gerät</span>
+                                        {pageData?.hero?.title || <>Für jeden Einsatz <br /><span className="text-brand-teal">das passende Gerät</span></>}
                                     </h1>
                                     <p className="text-xl text-zinc-200 leading-relaxed max-w-2xl drop-shadow-md">
-                                        Jede Branche hat ihre eigenen Anforderungen. Wir kennen die Herausforderungen und bieten maßgeschneiderte Lösungen für Ihren Erfolg.
+                                        {pageData?.hero?.description || "Jede Branche hat ihre eigenen Anforderungen. Wir kennen die Herausforderungen und bieten maßgeschneiderte Lösungen für Ihren Erfolg."}
                                     </p>
                                 </motion.div>
                             </div>
@@ -105,10 +123,10 @@ export default function IndustriesPage() {
             <section className="py-24 bg-white dark:bg-zinc-950">
                 <div className="container mx-auto px-6 text-center max-w-4xl">
                     <h2 className="text-3xl md:text-5xl font-bold text-brand-dark dark:text-white mb-8">
-                        Expertise über alle Branchen hinweg
+                        {pageData?.intro?.title || "Expertise über alle Branchen hinweg"}
                     </h2>
                     <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                        Ob in der Industriehalle, auf der Großbaustelle oder im unwegsamen Gelände – unsere Mietflotte ist so vielseitig wie Ihre Projekte. Entdecken Sie unsere spezialisierten Lösungen für Ihren Anwendungsbereich.
+                        {pageData?.intro?.description || "Ob in der Industriehalle, auf der Großbaustelle oder im unwegsamen Gelände – unsere Mietflotte ist so vielseitig wie Ihre Projekte. Entdecken Sie unsere spezialisierten Lösungen für Ihren Anwendungsbereich."}
                     </p>
                 </div>
             </section>
@@ -117,7 +135,7 @@ export default function IndustriesPage() {
             <section className="py-12 pb-32 bg-zinc-50 dark:bg-zinc-900/50">
                 <div className="container mx-auto px-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {industries.map((industry, index) => (
+                        {displayIndustries.map((industry: I_Any, index: number) => (
                             <motion.div
                                 key={industry.id}
                                 initial={{ opacity: 0, y: 20 }}

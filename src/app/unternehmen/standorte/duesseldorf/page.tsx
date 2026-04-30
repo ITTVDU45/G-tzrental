@@ -2,13 +2,13 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Phone, Mail, MapPin, Clock, Truck, Shield, GraduationCap, ChevronRight } from "lucide-react";
-import { useState } from "react";
-import Link from "next/link";
+import { Clock, Truck, Shield, GraduationCap, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { BlogSection } from "@/components/home/BlogSection";
 import { FaqSection } from "@/components/home/FaqSection";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
 import { CategorySlider } from "@/components/home/CategorySlider";
+import { I_Any } from "@/lib/types";
 
 const products = [
     {
@@ -99,6 +99,7 @@ const features = [
 ];
 
 export default function DuesseldorfPage() {
+    const [pageData, setPageData] = useState<I_Any>(null);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -112,6 +113,24 @@ export default function DuesseldorfPage() {
         console.log("Form submitted:", formData);
         // Handle form submission
     };
+
+    useEffect(() => {
+        const fetchPage = async () => {
+            try {
+                const res = await fetch("/api/cms?type=page_company_location_duesseldorf", { cache: "no-store" });
+                const data = await res.json();
+                setPageData(data);
+            } catch (error) {
+                console.error("Failed to load duesseldorf page data", error);
+            }
+        };
+
+        fetchPage();
+    }, []);
+
+    const featuredProducts = pageData?.featuredProducts && pageData.featuredProducts.length > 0
+        ? pageData.featuredProducts
+        : products;
 
     return (
         <div className="min-h-screen bg-white dark:bg-zinc-950">
@@ -127,13 +146,13 @@ export default function DuesseldorfPage() {
                         >
                             <div>
                                 <p className="text-sm font-bold text-brand-teal uppercase tracking-wider mb-4">
-                                    Arbeitsbühnen am Standort Düsseldorf
+                                    {pageData?.hero?.eyebrow || "Arbeitsbühnen am Standort Düsseldorf"}
                                 </p>
                                 <h1 className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-6 leading-tight">
-                                    Du möchtest eine Arbeitsbühne in <span className="text-brand-teal">Düsseldorf mieten?</span>
+                                    {pageData?.hero?.title || <>Du möchtest eine Arbeitsbühne in <span className="text-brand-teal">Düsseldorf mieten?</span></>}
                                 </h1>
                                 <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                    Bei GÖTZ RENTAL in Düsseldorf mietest du flexibel und jederzeit verfügbare Modelle: ob für Bauvorhaben, Wartungsarbeiten oder Events – bei uns stehen dir verschiedene moderne und leistungsstarke Arbeitsbühnen zur Auswahl. Von Scheren- über Teleskop- bis hin zu Gelenkteleskopbühnen.
+                                    {pageData?.hero?.description || "Bei GÖTZ RENTAL in Düsseldorf mietest du flexibel und jederzeit verfügbare Modelle: ob für Bauvorhaben, Wartungsarbeiten oder Events – bei uns stehen dir verschiedene moderne und leistungsstarke Arbeitsbühnen zur Auswahl. Von Scheren- über Teleskop- bis hin zu Gelenkteleskopbühnen."}
                                 </p>
                             </div>
 
@@ -200,7 +219,7 @@ export default function DuesseldorfPage() {
                             className="relative h-[600px] rounded-[2rem] overflow-hidden shadow-2xl"
                         >
                             <Image
-                                src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000"
+                                src={pageData?.hero?.image || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000"}
                                 alt="Götz Rental Düsseldorf Standort"
                                 fill
                                 className="object-cover"
@@ -217,19 +236,19 @@ export default function DuesseldorfPage() {
                         <div className="text-center md:text-left">
                             <p className="text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Adresse</p>
                             <p className="font-bold text-zinc-900 dark:text-white mb-1">GÖTZ RENTAL Arbeitsbühnen und Stapler</p>
-                            <p className="text-zinc-600 dark:text-zinc-400">Musterstraße 123</p>
-                            <p className="text-zinc-600 dark:text-zinc-400">D-40210 Düsseldorf</p>
+                            <p className="text-zinc-600 dark:text-zinc-400">{pageData?.contact?.addressLines?.[0] || "Musterstraße 123"}</p>
+                            <p className="text-zinc-600 dark:text-zinc-400">{pageData?.contact?.addressLines?.[1] || "D-40210 Düsseldorf"}</p>
                         </div>
                         <div className="text-center md:text-left">
                             <p className="text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">E-Mail</p>
-                            <a href="mailto:duesseldorf@goetz-rental.de" className="text-brand-teal font-bold hover:underline">
-                                duesseldorf@goetz-rental.de
+                            <a href={`mailto:${pageData?.contact?.email || "duesseldorf@goetz-rental.de"}`} className="text-brand-teal font-bold hover:underline">
+                                {pageData?.contact?.email || "duesseldorf@goetz-rental.de"}
                             </a>
                         </div>
                         <div className="text-center md:text-left">
                             <p className="text-sm font-bold text-zinc-400 uppercase tracking-wider mb-2">Telefon</p>
-                            <a href="tel:+492111234567" className="text-brand-teal font-bold hover:underline">
-                                +49 211 1234567
+                            <a href={`tel:${(pageData?.contact?.phone || "+49 211 1234567").replace(/\s+/g, "")}`} className="text-brand-teal font-bold hover:underline">
+                                {pageData?.contact?.phone || "+49 211 1234567"}
                             </a>
                         </div>
                     </div>
@@ -381,7 +400,7 @@ export default function DuesseldorfPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                        {products.map((product, index) => (
+                        {featuredProducts.map((product: I_Any, index: number) => (
                             <motion.div
                                 key={product.id}
                                 initial={{ opacity: 0, y: 20 }}

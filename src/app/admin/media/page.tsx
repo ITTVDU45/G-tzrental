@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Trash2, Image as ImageIcon, Plus, X, Search, FileImage } from 'lucide-react';
+import { Trash2, Image as ImageIcon, Plus, Search } from 'lucide-react';
 import Image from 'next/image';
 
 interface MediaItem {
@@ -140,6 +140,7 @@ export default function AdminMediaPage() {
                                 src={item.url}
                                 alt={item.name}
                                 fill
+                                unoptimized
                                 className="object-cover"
                             />
                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 text-center">

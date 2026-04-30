@@ -1,55 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { readDb, writeDb } from '@/lib/db';
-import { getSession } from '@/lib/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { COLLECTIONS, deleteByBusinessId, listSeededCollection, seedPages, upsertByBusinessId } from "@/lib/mongo-admin";
 
 export async function GET() {
-    const db = await readDb();
-    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
-
-    // Seed if empty
-    if (!db.pages || db.pages.length === 0) {
-        db.pages = [
-            { id: 'page-1', title: 'Startseite', slug: '/', status: 'published', lastModified: '2024-01-30' },
-            { id: 'page-2', title: 'Mietpark', slug: '/mieten', status: 'published', lastModified: '2024-01-28' },
-            { id: 'page-3', title: 'Unternehmen', slug: '/unternehmen/ueber-uns', status: 'published', lastModified: '2024-01-25' },
-            { id: 'page-4', title: 'Kontakt', slug: '/kontakt', status: 'published', lastModified: '2024-01-20' },
-        ];
-        await writeDb(db);
-    }
-
-    return NextResponse.json(db.pages || []);
+    const pages = await listSeededCollection(COLLECTIONS.pages, "pages");
+    return NextResponse.json(pages);
 }
 
 export async function POST(req: NextRequest) {
     const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    await seedPages();
     const page = await req.json();
-    const db = await readDb();
-    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
+    const saved = await upsertByBusinessId(
+        COLLECTIONS.pages,
+        page,
+        () => `page-${Date.now()}`
+    );
 
-    if (page.id) {
-        const idx = db.pages.findIndex((p: any) => p.id === page.id);
-        if (idx !== -1) db.pages[idx] = page;
-        else db.pages.push(page);
-    } else {
-        page.id = 'page-' + Date.now();
-        db.pages.push(page);
-    }
-
-    await writeDb(db);
-    return NextResponse.json(page);
+    return NextResponse.json(saved);
 }
 
 export async function DELETE(req: NextRequest) {
     const session = await getSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await req.json();
-    const db = await readDb();
-    if (!db) return NextResponse.json({ error: 'Database error' }, { status: 500 });
-
-    db.pages = db.pages.filter((p: any) => p.id !== id);
-    await writeDb(db);
+    await deleteByBusinessId(COLLECTIONS.pages, id);
     return NextResponse.json({ success: true });
 }

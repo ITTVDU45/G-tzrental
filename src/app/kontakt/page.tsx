@@ -1,13 +1,30 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, MessageCircle, Clock, CheckCircle2, Truck, Lock, CreditCard, ChevronDown } from "lucide-react";
+import { Phone, MapPin, MessageCircle, Truck, Lock, CreditCard, ChevronDown } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { BlogSection } from "@/components/home/BlogSection";
+import { I_Any } from "@/lib/types";
 
 export default function ContactPage() {
+    const [pageData, setPageData] = useState<I_Any>(null);
+
+    useEffect(() => {
+        const fetchPage = async () => {
+            try {
+                const res = await fetch("/api/cms?type=page_contact", { cache: "no-store" });
+                const data = await res.json();
+                setPageData(data);
+            } catch (error) {
+                console.error("Failed to load contact page data", error);
+            }
+        };
+
+        fetchPage();
+    }, []);
+
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 pt-24 pb-20">
             {/* Header */}
@@ -17,7 +34,7 @@ export default function ContactPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tight"
                 >
-                    Kontakt aufnehmen
+                    {pageData?.hero?.title || "Kontakt aufnehmen"}
                 </motion.h1>
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
@@ -25,7 +42,7 @@ export default function ContactPage() {
                     transition={{ delay: 0.1 }}
                     className="text-lg text-zinc-500 max-w-3xl leading-relaxed"
                 >
-                    Landshut, Regensburg, München, Hamburg oder Wien – wir sind per Chat oder Telefon direkt erreichbar.
+                    {pageData?.hero?.description || "Landshut, Regensburg, München, Hamburg oder Wien – wir sind per Chat oder Telefon direkt erreichbar."}
                 </motion.p>
             </div>
 
@@ -52,19 +69,19 @@ export default function ContactPage() {
                                     </div>
                                 ))}
                             </div>
-                            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-2">24/7 Erreichbar</span>
+                            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-2">{pageData?.chatSection?.badge || "24/7 Erreichbar"}</span>
                         </div>
 
                         <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white mb-6">
-                            Starte deine Anfrage direkt im Chat
+                            {pageData?.chatSection?.title || "Starte deine Anfrage direkt im Chat"}
                         </h2>
                         <p className="text-zinc-500 mb-8 max-w-lg leading-relaxed">
-                            Du hast eine konkrete Frage zu Geräten, Verfügbarkeit oder Einsatzbedingungen? Unser Team und unser Chatbot antworten schnell und helfen dir bei der richtigen Lösung – direkt im Chat, ohne Wartezeit.
+                            {pageData?.chatSection?.description || "Du hast eine konkrete Frage zu Geräten, Verfügbarkeit oder Einsatzbedingungen? Unser Team und unser Chatbot antworten schnell und helfen dir bei der richtigen Lösung – direkt im Chat, ohne Wartezeit."}
                         </p>
 
                         <button className="bg-[#004e8d] hover:bg-[#003d70] text-white px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                             <MessageCircle className="w-5 h-5" />
-                            Jetzt Chat starten
+                            {pageData?.chatSection?.ctaLabel || "Jetzt Chat starten"}
                         </button>
                     </div>
 
@@ -119,8 +136,8 @@ export default function ContactPage() {
                         className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-zinc-100 dark:border-zinc-800"
                     >
                         <div className="mb-8">
-                            <span className="text-zinc-500 text-lg block mb-2">Oder nutze unser</span>
-                            <h2 className="text-3xl font-bold text-zinc-900 dark:text-white">Kontaktformular für Angebots- und Projektanfragen</h2>
+                            <span className="text-zinc-500 text-lg block mb-2">{pageData?.form?.eyebrow || "Oder nutze unser"}</span>
+                            <h2 className="text-3xl font-bold text-zinc-900 dark:text-white">{pageData?.form?.title || "Kontaktformular für Angebots- und Projektanfragen"}</h2>
                         </div>
 
                         <form className="space-y-6">
@@ -147,10 +164,9 @@ export default function ContactPage() {
                                 <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 ml-1">Thema</label>
                                 <div className="relative">
                                     <select className="w-full bg-zinc-50 dark:bg-zinc-800 border-none rounded-2xl px-5 py-4 appearance-none focus:ring-2 focus:ring-brand-teal/20 transition-all outline-none">
-                                        <option>Allgemeine Anfrage</option>
-                                        <option>Mietanfrage</option>
-                                        <option>Kaufanfrage</option>
-                                        <option>Service & Wartung</option>
+                                        {(pageData?.form?.topics || ["Allgemeine Anfrage", "Mietanfrage", "Kaufanfrage", "Service & Wartung"]).map((topic: string) => (
+                                            <option key={topic}>{topic}</option>
+                                        ))}
                                     </select>
                                     <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
                                 </div>
@@ -178,46 +194,39 @@ export default function ContactPage() {
                         <div>
                             <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-6">Unsere Adressen</h3>
                             <div className="space-y-8">
-                                <div>
-                                    <h4 className="font-bold text-zinc-900 dark:text-white text-lg mb-1">Götz Rental GmbH</h4>
-                                    <p className="text-zinc-500 leading-relaxed text-sm">
-                                        Hansestraße 45<br />
-                                        20095 Hamburg
-                                    </p>
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-zinc-900 dark:text-white text-lg mb-1">Standort München</h4>
-                                    <p className="text-zinc-500 leading-relaxed text-sm">
-                                        Leopoldstraße 23<br />
-                                        80802 München
-                                    </p>
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-zinc-900 dark:text-white text-lg mb-1">Standort Regensburg</h4>
-                                    <p className="text-zinc-500 leading-relaxed text-sm">
-                                        Landauer Str. 1<br />
-                                        93055 Regensburg
-                                    </p>
-                                </div>
+                                {(pageData?.addresses || [
+                                    { title: "Götz Rental GmbH", lines: ["Hansestraße 45", "20095 Hamburg"] },
+                                    { title: "Standort München", lines: ["Leopoldstraße 23", "80802 München"] },
+                                    { title: "Standort Regensburg", lines: ["Landauer Str. 1", "93055 Regensburg"] }
+                                ]).map((address: I_Any) => (
+                                    <div key={address.title}>
+                                        <h4 className="font-bold text-zinc-900 dark:text-white text-lg mb-1">{address.title}</h4>
+                                        <p className="text-zinc-500 leading-relaxed text-sm">
+                                            {(address.lines || []).map((line: string) => <span key={line}>{line}<br /></span>)}
+                                        </p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
                         <div>
                             <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-6">Per E-Mail</h3>
-                            <a href="mailto:info@goetzrental.de" className="text-zinc-900 dark:text-white font-medium hover:text-brand-teal transition-colors">
-                                info@goetzrental.de
+                            <a href={`mailto:${pageData?.email || "info@goetzrental.de"}`} className="text-zinc-900 dark:text-white font-medium hover:text-brand-teal transition-colors">
+                                {pageData?.email || "info@goetzrental.de"}
                             </a>
                         </div>
 
                         <div>
                             <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-6">Telefonisch</h3>
                             <div className="space-y-2">
-                                <a href="tel:+49600123456" className="block text-zinc-900 dark:text-white font-medium hover:text-brand-teal transition-colors">
-                                    Hamburg: +49 40 123 456
-                                </a>
-                                <a href="tel:+49891234567" className="block text-zinc-900 dark:text-white font-medium hover:text-brand-teal transition-colors">
-                                    München: +49 89 123 456
-                                </a>
+                                {(pageData?.phones || [
+                                    { label: "Hamburg", value: "+49 40 123 456", href: "tel:+49600123456" },
+                                    { label: "München", value: "+49 89 123 456", href: "tel:+49891234567" }
+                                ]).map((phone: I_Any) => (
+                                    <a key={phone.label} href={phone.href} className="block text-zinc-900 dark:text-white font-medium hover:text-brand-teal transition-colors">
+                                        {phone.label}: {phone.value}
+                                    </a>
+                                ))}
                             </div>
                         </div>
                     </motion.div>
@@ -225,34 +234,23 @@ export default function ContactPage() {
 
                 {/* Feature Highlights */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-12 border-t border-zinc-100 dark:border-zinc-800">
-                    <div className="flex gap-4">
-                        <Phone className="w-6 h-6 flex-shrink-0 text-zinc-900 dark:text-white mt-1" />
-                        <div>
-                            <h4 className="font-bold text-zinc-900 dark:text-white mb-1">24/7 Notfall Hotline</h4>
-                            <p className="text-xs text-zinc-500 leading-relaxed">Als Mieter unserer Geräte erreichst du uns rund um die Uhr unter: +49 40 123456.</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-4">
-                        <Truck className="w-6 h-6 flex-shrink-0 text-zinc-900 dark:text-white mt-1" />
-                        <div>
-                            <h4 className="font-bold text-zinc-900 dark:text-white mb-1">Inklusive Anlieferung</h4>
-                            <p className="text-xs text-zinc-500 leading-relaxed">Wir liefern gemietete Arbeitsbühnen & Stapler direkt zu deinem Projekt – oder du holst direkt selbst ab.</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-4">
-                        <Lock className="w-6 h-6 flex-shrink-0 text-zinc-900 dark:text-white mt-1" />
-                        <div>
-                            <h4 className="font-bold text-zinc-900 dark:text-white mb-1">Zugangskontrolle</h4>
-                            <p className="text-xs text-zinc-500 leading-relaxed">Vertraue auf unsere GÖTZ KEY CARD: nie wieder Fremdnutzung von Maschinen. Versprochen.</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-4">
-                        <CreditCard className="w-6 h-6 flex-shrink-0 text-zinc-900 dark:text-white mt-1" />
-                        <div>
-                            <h4 className="font-bold text-zinc-900 dark:text-white mb-1">SYSTEM-CARD Schulungen</h4>
-                            <p className="text-xs text-zinc-500 leading-relaxed">Praxisnah, anerkannt, direkt bei uns – zertifizierte SYSTEM-CARD Schulungen.</p>
-                        </div>
-                    </div>
+                    {(pageData?.featureHighlights || [
+                        { title: "24/7 Notfall Hotline", description: "Als Mieter unserer Geräte erreichst du uns rund um die Uhr unter: +49 40 123456." },
+                        { title: "Inklusive Anlieferung", description: "Wir liefern gemietete Arbeitsbühnen & Stapler direkt zu deinem Projekt – oder du holst direkt selbst ab." },
+                        { title: "Zugangskontrolle", description: "Vertraue auf unsere GÖTZ KEY CARD: nie wieder Fremdnutzung von Maschinen. Versprochen." },
+                        { title: "SYSTEM-CARD Schulungen", description: "Praxisnah, anerkannt, direkt bei uns – zertifizierte SYSTEM-CARD Schulungen." }
+                    ]).map((item: I_Any, index: number) => {
+                        const Icon = [Phone, Truck, Lock, CreditCard][index] || Phone;
+                        return (
+                            <div key={item.title} className="flex gap-4">
+                                <Icon className="w-6 h-6 flex-shrink-0 text-zinc-900 dark:text-white mt-1" />
+                                <div>
+                                    <h4 className="font-bold text-zinc-900 dark:text-white mb-1">{item.title}</h4>
+                                    <p className="text-xs text-zinc-500 leading-relaxed">{item.description}</p>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -260,7 +258,7 @@ export default function ContactPage() {
             <div className="container mx-auto px-6 mt-12">
                 <div className="w-full h-[500px] bg-zinc-100 relative grayscale mix-blend-multiply dark:mix-blend-normal dark:opacity-80 rounded-[3rem] overflow-hidden border border-zinc-200 dark:border-zinc-800">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d155455.67954153725!2d11.458927807185072!3d48.154910609653775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x479e75f9a38c5fd9%3A0x10cb84a7db1987d!2sM%C3%BCnchen!5e0!3m2!1sde!2sde!4v1706697486542!5m2!1sde!2sde"
+                        src={pageData?.map?.embedSrc || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d155455.67954153725!2d11.458927807185072!3d48.154910609653775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x479e75f9a38c5fd9%3A0x10cb84a7db1987d!2sM%C3%BCnchen!5e0!3m2!1sde!2sde!4v1706697486542!5m2!1sde!2sde"}
                         width="100%"
                         height="100%"
                         style={{ border: 0, filter: 'grayscale(100%) contrast(1.1)' }}
@@ -270,33 +268,29 @@ export default function ContactPage() {
                     ></iframe>
                     {/* Floating Location Cards Overlay (Style element "eine Karte" mentioned) */}
                     <div className="absolute top-8 left-8 md:top-12 md:left-12 space-y-4 pointer-events-none">
-                        <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl shadow-xl border border-zinc-100 dark:border-zinc-800 flex items-center gap-3 w-64 pointer-events-auto hover:scale-105 transition-transform">
-                            <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-full">
-                                <MapPin className="w-5 h-5 text-zinc-900 dark:text-white" />
+                        {(pageData?.map?.cards || [
+                            { label: "Hauptquartier", title: "Hamburg City" },
+                            { label: "Standort", title: "München Nord" }
+                        ]).map((card: I_Any) => (
+                            <div key={card.title} className="bg-white dark:bg-zinc-900 p-4 rounded-xl shadow-xl border border-zinc-100 dark:border-zinc-800 flex items-center gap-3 w-64 pointer-events-auto hover:scale-105 transition-transform">
+                                <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-full">
+                                    <MapPin className="w-5 h-5 text-zinc-900 dark:text-white" />
+                                </div>
+                                <div>
+                                    <div className="text-xs font-bold uppercase text-zinc-400">{card.label}</div>
+                                    <div className="font-bold text-sm">{card.title}</div>
+                                </div>
                             </div>
-                            <div>
-                                <div className="text-xs font-bold uppercase text-zinc-400">Hauptquartier</div>
-                                <div className="font-bold text-sm">Hamburg City</div>
-                            </div>
-                        </div>
-                        <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl shadow-xl border border-zinc-100 dark:border-zinc-800 flex items-center gap-3 w-64 pointer-events-auto hover:scale-105 transition-transform">
-                            <div className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-full">
-                                <MapPin className="w-5 h-5 text-zinc-900 dark:text-white" />
-                            </div>
-                            <div>
-                                <div className="text-xs font-bold uppercase text-zinc-400">Standort</div>
-                                <div className="font-bold text-sm">München Nord</div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>
 
             {/* Testimonials */}
-            <TestimonialsSection pageId="page-4" />
+            <TestimonialsSection pageId={pageData?.references?.pageId || "page-4"} />
 
             {/* Blog Section */}
-            <BlogSection pageId="page-4" />
+            <BlogSection pageId={pageData?.references?.pageId || "page-4"} />
 
             {/* Floating FAB */}
             <div className="fixed bottom-8 right-8 z-50">

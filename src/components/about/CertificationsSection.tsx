@@ -1,6 +1,6 @@
 "use client";
 
-import { Award, Leaf, Users } from "lucide-react";
+import { Award, Leaf, Users, type LucideIcon } from "lucide-react";
 
 const certifications = [
     {
@@ -29,7 +29,23 @@ const certifications = [
     }
 ];
 
-export function CertificationsSection() {
+interface CertificationsSectionProps {
+    content?: {
+        title?: string;
+        description?: string;
+        items?: {
+            title: string;
+            iso: string;
+            desc: string;
+            icon?: LucideIcon;
+            color?: string;
+            bg?: string;
+        }[];
+    };
+}
+
+export function CertificationsSection({ content }: CertificationsSectionProps) {
+    const displayItems = content?.items && content.items.length > 0 ? content.items : certifications;
     return (
         <div className="container mx-auto px-6 mb-32">
             <div className="bg-zinc-900 rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden">
@@ -37,17 +53,23 @@ export function CertificationsSection() {
                 <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-teal/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
                 <div className="relative z-10 max-w-3xl">
-                    <h2 className="text-4xl md:text-6xl font-bold mb-8">Zertifizierte Exzellenz</h2>
+                    <h2 className="text-4xl md:text-6xl font-bold mb-8">{content?.title || "Zertifizierte Exzellenz"}</h2>
                     <p className="text-xl text-zinc-300 mb-12 leading-relaxed">
-                        Unsere Unternehmenspolitik basiert auf hohen Standards in den Bereichen Qualität, Arbeitssicherheit und Umweltschutz. Diese Zertifikate belegen unser Engagement für höchste Effizienz, Sicherheit und Nachhaltigkeit.
+                        {content?.description || "Unsere Unternehmenspolitik basiert auf hohen Standards in den Bereichen Qualität, Arbeitssicherheit und Umweltschutz. Diese Zertifikate belegen unser Engagement für höchste Effizienz, Sicherheit und Nachhaltigkeit."}
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-                    {certifications.map((cert, idx) => (
+                    {displayItems.map((cert, idx) => {
+                        const fallback = certifications[idx % certifications.length];
+                        const icon = cert.icon || fallback.icon;
+                        const color = cert.color || fallback.color;
+                        const bg = cert.bg || fallback.bg;
+                        const Icon = icon;
+                        return (
                         <div key={idx} className="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-colors">
-                            <div className={`w-12 h-12 rounded-xl ${cert.bg} ${cert.color} flex items-center justify-center mb-6`}>
-                                <cert.icon className="w-6 h-6" />
+                            <div className={`w-12 h-12 rounded-xl ${bg} ${color} flex items-center justify-center mb-6`}>
+                                <Icon className="w-6 h-6" />
                             </div>
                             <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
                             <div className="text-sm font-mono text-brand-lime mb-4">{cert.iso}</div>
@@ -55,7 +77,7 @@ export function CertificationsSection() {
                                 {cert.desc}
                             </p>
                         </div>
-                    ))}
+                    )})}
                 </div>
             </div>
         </div>

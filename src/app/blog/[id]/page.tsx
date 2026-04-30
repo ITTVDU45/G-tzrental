@@ -3,22 +3,21 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Clock, ChevronRight, Share2, Facebook, Twitter, Linkedin } from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowLeft, Calendar, Clock, ChevronRight, Facebook, Twitter, Linkedin } from "lucide-react";
 import { useParams } from "next/navigation";
+import { I_Any } from "@/lib/types";
 
 export default function BlogDetailPage() {
     const { id } = useParams();
-    const [post, setPost] = useState<any>(null);
+    const [post, setPost] = useState<I_Any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const res = await fetch('/api/admin/blog');
+                const res = await fetch(`/api/cms?type=page_blog_post_${id}`, { cache: "no-store" });
                 const data = await res.json();
-                const found = data.find((p: any) => p.id === id);
-                setPost(found);
+                setPost(data?.error ? null : data);
             } catch (err) {
                 console.error(err);
             } finally {

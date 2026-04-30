@@ -38,6 +38,12 @@ export default function ImagePicker({ value, onChangeAction, label = "Bild" }: I
         }
     };
 
+    useEffect(() => {
+        if (isGalleryOpen) {
+            fetchMedia();
+        }
+    }, [isGalleryOpen]);
+
     const handleUpload = async (file: File) => {
         setUploading(true);
         const formData = new FormData();
@@ -86,7 +92,7 @@ export default function ImagePicker({ value, onChangeAction, label = "Bild" }: I
             >
                 {value ? (
                     <>
-                        <Image src={value} alt="Preview" fill className="object-contain p-4" />
+                        <Image src={value} alt="Preview" fill unoptimized className="object-contain p-4" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                             <button
                                 type="button"
@@ -208,7 +214,7 @@ export default function ImagePicker({ value, onChangeAction, label = "Bild" }: I
                                                     value === item.url ? "border-brand-teal ring-4 ring-brand-teal/20 shadow-xl" : "border-zinc-100 dark:border-zinc-800"
                                                 )}
                                             >
-                                                <Image src={item.url} alt={item.name} fill className="object-cover" />
+                                                <Image src={item.url} alt={item.name} fill unoptimized className="object-cover" />
                                                 <div className="absolute inset-0 bg-brand-teal/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                     <CheckCircle2 className="w-8 h-8 text-white drop-shadow-lg" />
                                                 </div>

@@ -10,12 +10,18 @@ const associations = [
     "IPAF"
 ];
 
-export function AssociationsSection() {
+interface AssociationsSectionProps {
+    title?: string;
+    items?: string[];
+}
+
+export function AssociationsSection({ title, items }: AssociationsSectionProps) {
+    const displayItems = items && items.length > 0 ? items : associations;
     return (
         <div className="container mx-auto px-6 pb-24 text-center">
-            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-12">Mitwirkung in Verbänden</p>
+            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-12">{title || "Mitwirkung in Verbänden"}</p>
             <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
-                {associations.map((assoc, i) => (
+                {displayItems.map((assoc, i) => (
                     <div key={i} className="px-6 py-3 rounded-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-sm font-medium">
                         {assoc}
                     </div>

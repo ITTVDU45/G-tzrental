@@ -59,7 +59,17 @@ const highlightProducts = [
     },
 ];
 
-export function LargeProductCarousel() {
+type HighlightItem = (typeof highlightProducts)[number] & {
+    href?: string;
+};
+
+interface LargeProductCarouselProps {
+    title?: string;
+    items?: HighlightItem[];
+}
+
+export function LargeProductCarousel({ title, items }: LargeProductCarouselProps) {
+    const displayItems: HighlightItem[] = items && items.length > 0 ? items : highlightProducts;
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const scroll = (direction: "left" | "right") => {
@@ -78,7 +88,7 @@ export function LargeProductCarousel() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-12">
                     <h2 className="text-3xl md:text-5xl font-bold text-brand-dark max-w-2xl">
-                        Unsere Highlights
+                        {title || "Unsere Highlights"}
                     </h2>
 
                     <div className="flex gap-4">
@@ -103,7 +113,7 @@ export function LargeProductCarousel() {
                     className="flex gap-8 overflow-x-auto py-12 px-16 snap-x scrollbar-none"
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
-                    {highlightProducts.map((item, index) => (
+                    {displayItems.map((item, index) => (
                         <motion.div
                             key={item.id}
                             whileHover={{ y: -8 }}
@@ -112,7 +122,7 @@ export function LargeProductCarousel() {
                                 } ${index === 0 ? "ml-4" : ""}`}
                         >
                             <Link
-                                href={item.isSpecial ? "/mieten" : `/mieten/geraet/${item.id === 'scissors' ? 'mb-80-e' : item.id === 'telescope' ? 'tb-160' : item.id === 'forklift' ? 'gs-25' : 'all'}`}
+                                href={item.href || (item.isSpecial ? "/mieten" : `/mieten/geraet/${item.id === 'scissors' ? 'mb-80-e' : item.id === 'telescope' ? 'tb-160' : item.id === 'forklift' ? 'gs-25' : 'all'}`)}
                                 className={`block h-full group relative rounded-[2rem] shadow-md hover:shadow-2xl transition-all duration-500 ${item.isSpecial ? "ring-2 ring-brand-teal ring-offset-4 ring-offset-zinc-50 dark:ring-offset-zinc-900" : ""}`}
                             >
                                 <div className="absolute inset-0 rounded-[2rem] overflow-hidden">
