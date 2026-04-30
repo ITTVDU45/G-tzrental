@@ -3,10 +3,11 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-brand-dark: #002D2D;
-  --color-brand-lime: #95BF47;
-  --color-brand-green: #5E8E3E;
-  --color-brand-teal: #008060;
+  --color-brand-dark: #011f4b;
+  --color-brand-green: #03396c;
+  --color-brand-teal: #005b96;
+  --color-brand-lime: #6497b1;
+  --color-brand-soft: #b3cde0;
 
   --color-primary: var(--color-brand-teal);
   --color-secondary: var(--color-brand-green);
@@ -21,11 +22,11 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #002D2D;
+  --foreground: #011f4b;
 }
 
 .dark {
-  --background: #002D2D;
+  --background: #011f4b;
   --foreground: #ffffff;
 }
 

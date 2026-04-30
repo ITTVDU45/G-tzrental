@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
-import { CategorySlider } from "@/components/home/CategorySlider";
 import { FeatureSection } from "@/components/home/FeatureSection";
 import { HeightSelector } from "@/components/home/HeightSelector";
 import { ProductGridSection } from "@/components/home/ProductGridSection";
@@ -39,13 +38,12 @@ export default function Home() {
         onExploreClick={() => setIsSelectorOpen(true)}
         items={pageData?.hero?.slides}
       />
-      <CategorySlider />
+      <ProductGridSection />
       <FeatureSection
         onCtaClick={() => setIsSelectorOpen(true)}
         content={pageData?.featureSection}
       />
       <HeightSelector content={pageData?.heightSelector} />
-      <ProductGridSection />
       <LargeProductCarousel
         title={pageData?.highlightCarousel?.title}
         items={pageData?.highlightCarousel?.items}
@@ -57,7 +55,11 @@ export default function Home() {
         subtitle={pageData?.faq?.subtitle}
         items={pageData?.faq?.items}
       />
-      <BlogSection pageId={pageData?.references?.pageId || "page-1"} />
+      <BlogSection
+        pageId={pageData?.references?.pageId || "page-1"}
+        title={pageData?.blogSection?.title}
+        subtitle={pageData?.blogSection?.subtitle}
+      />
       <FinalCtaSection />
 
       <ProductSelector

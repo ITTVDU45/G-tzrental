@@ -65,9 +65,9 @@ function ConfiguratorContent({ locationSlug }: ConfiguratorShellProps) {
     if (state.isSuccess) {
         return (
             <div className="w-full max-w-5xl mx-auto min-h-[500px] flex flex-col items-center justify-center bg-white dark:bg-zinc-900 rounded-[2rem] shadow-2xl p-12 text-center">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                    <div className="w-10 h-10 border-l-4 border-b-4 border-green-500 -rotate-45 relative top-[-2px] left-[2px] transform origin-center" style={{ transform: 'rotate(-45deg)' }}></div> {/* Simple Check Icon via CSS or use Lucide */}
-                    <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-brand-soft/50">
+                    <div className="relative top-[-2px] left-[2px] h-10 w-10 origin-center -rotate-45 transform border-l-4 border-b-4 border-brand-teal" style={{ transform: 'rotate(-45deg)' }}></div>
+                    <svg className="w-10 h-10 text-brand-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                 </div>

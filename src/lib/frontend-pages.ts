@@ -16,6 +16,22 @@ export const FRONTEND_PAGE_COLLECTIONS = {
 } as const;
 
 type StaticPageKey = keyof typeof FRONTEND_PAGE_COLLECTIONS;
+type AdminPageOption = {
+    id: string;
+    title: string;
+    slug: string;
+};
+
+const STATIC_ADMIN_PAGE_OPTIONS: AdminPageOption[] = [
+    { id: "page-1", title: "Startseite", slug: "/" },
+    { id: "page-2", title: "Mietpark", slug: "/mieten" },
+    { id: "page-3", title: "Über GÖTZ RENTAL", slug: "/unternehmen/ueber-uns" },
+    { id: "page-4", title: "Kontakt", slug: "/kontakt" },
+    { id: "page-company-industries", title: "Einsatz & Branchen", slug: "/unternehmen/branchen" },
+    { id: "page-company-insights", title: "Insights", slug: "/unternehmen/insights" },
+    { id: "page-blog-listing", title: "Blog & Ratgeber", slug: "/blog" },
+    { id: "page-company-location-duesseldorf", title: "Standort Düsseldorf", slug: "/unternehmen/standorte/duesseldorf" },
+];
 
 function deepClone<T>(value: T): T {
     return JSON.parse(JSON.stringify(value));
@@ -592,7 +608,7 @@ const STATIC_PAGE_SEEDS: Record<StaticPageKey, I_AdminDoc> = {
                 title: "GaLaBau",
                 description: "Geländegängige Bühnen für den Baumschnitt und Landschaftsbau. Schonend für den Untergrund.",
                 image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=800",
-                color: "bg-green-500"
+                color: "bg-brand-teal"
             },
             {
                 id: "events",
@@ -729,6 +745,36 @@ async function listBlogPosts() {
 
 async function listLocations() {
     return listSeededCollection(COLLECTIONS.locations, "locations", []);
+}
+
+export async function getAdminPageOptions() {
+    const [legacyPages, locations] = await Promise.all([
+        listSeededCollection(COLLECTIONS.pages, "pages", []),
+        listLocations(),
+    ]);
+
+    const options = new Map<string, AdminPageOption>();
+
+    [...STATIC_ADMIN_PAGE_OPTIONS, ...legacyPages.map((page: I_Any) => ({
+        id: page.id,
+        title: page.title || page.name || page.slug || page.id,
+        slug: page.slug || "/",
+    }))].forEach((page) => {
+        if (!page?.id || !page?.title) return;
+        options.set(page.id, page);
+    });
+
+    locations
+        .filter((location: I_Any) => location?.id && location?.name)
+        .forEach((location: I_Any) => {
+            options.set(location.id, {
+                id: location.id,
+                title: location.name,
+                slug: `/standorte/${normalizeUmlauts(location.name).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`,
+            });
+        });
+
+    return Array.from(options.values()).sort((a, b) => a.title.localeCompare(b.title, "de"));
 }
 
 function buildGenericLocationSeed(location: I_Any, slug: string) {

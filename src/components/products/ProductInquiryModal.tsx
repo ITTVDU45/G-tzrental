@@ -107,8 +107,8 @@ export default function ProductInquiryModal({ isOpen, onClose, product }: Produc
                     >
                         {isSuccess ? (
                             <div className="p-12 text-center">
-                                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 mx-auto">
-                                    <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-brand-soft/50">
+                                    <svg className="w-10 h-10 text-brand-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>

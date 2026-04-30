@@ -85,7 +85,6 @@ const navItems = [
     },
     {
         name: "Standorte",
-        href: "/standorte",
         enhancedDropdown: true,
     },
     {
@@ -97,10 +96,6 @@ const navItems = [
         name: "Unternehmen",
         href: "/unternehmen",
         enhancedDropdown: true,
-    },
-    {
-        name: "Kontakt",
-        href: "/kontakt",
     },
 ];
 
@@ -170,65 +165,16 @@ const serviceMenuItems: MenuItem[] = [
         link: "/service/arbeitsbuehnen"
     },
     {
-        title: "Staplervermietung",
-        icon: "🚜",
-        description: "Teleskopstapler und mehr für Ihre Projekte",
-        link: "/service/stapler"
-    },
-    {
-        title: "24/7-Notdienst-Hotline",
-        icon: "📞",
-        description: "Rund um die Uhr für Sie erreichbar",
-        link: "/service/notdienst",
-        highlight: true
-    },
-    {
-        title: "Baustellenbesichtigung",
-        icon: "👁️",
-        description: "Kostenlose Beratung vor Ort",
-        link: "/service/besichtigung"
-    },
-    {
         title: "Bedienpersonal",
         icon: "👷",
         description: "Qualifizierte Fachkräfte auf Anfrage",
         link: "/service/personal"
     },
     {
-        title: "Ersatzteileservice",
-        icon: "⚙️",
-        description: "Original-Ersatzteile schnell verfügbar",
-        link: "/service/ersatzteile"
-    },
-    {
-        title: "Fehlercode-Finder",
-        icon: "🔍",
-        description: "Schnelle Diagnose und Problemlösung",
-        link: "/service/fehlercode"
-    },
-    {
         title: "Schulungen",
         icon: "🎓",
         description: "Zertifizierte Bedienerschulungen",
         link: "/service/schulungen"
-    },
-    {
-        title: "Inspektion & Wartung",
-        icon: "🔧",
-        description: "Regelmäßige Wartung für maximale Sicherheit",
-        link: "/service/wartung"
-    },
-    {
-        title: "Reparatur & Service",
-        icon: "🛠️",
-        description: "Schnelle Reparaturen durch Experten",
-        link: "/service/reparatur"
-    },
-    {
-        title: "UVV-Prüfungen",
-        icon: "✅",
-        description: "Gesetzlich vorgeschriebene Sicherheitsprüfungen",
-        link: "/service/uvv"
     }
 ];
 
@@ -240,10 +186,10 @@ const companyMenuItems: MenuItem[] = [
         link: "/unternehmen/anfahrt"
     },
     {
-        title: "Ansprechpartner",
-        icon: "👥",
-        description: "Ihr direkter Kontakt zu uns",
-        link: "/unternehmen/ansprechpartner"
+        title: "Kontakt",
+        icon: "✉️",
+        description: "Direkt mit uns in Verbindung treten",
+        link: "/kontakt"
     },
     {
         title: "Einsatz & Branchen",
@@ -466,13 +412,13 @@ export function Header() {
                                     whileTap={{ scale: 0.98 }}
                                     transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                                     animate={{
-                                        width: isScrolled ? 208 : 288,
-                                        height: isScrolled ? 48 : 72,
+                                        width: isScrolled ? 240 : 300,
+                                        height: isScrolled ? 64 : 90,
                                     }}
                                     className="relative"
                                 >
                                     <Image
-                                        src="/GötzRental2.png"
+                                        src="/Logo3.png"
                                         alt="GötzRental Logo"
                                         fill
                                         className="object-contain"
@@ -512,23 +458,43 @@ export function Header() {
                                             layout
                                             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                                         >
-                                        <Link
-                                            href={item.href}
-                                            className={cn(
-                                                "flex items-center gap-1 font-semibold text-zinc-700 transition-colors hover:text-brand-teal dark:text-zinc-300 dark:hover:text-brand-teal rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
-                                                isScrolled
-                                                    ? "px-3 py-2 text-[13px]"
-                                                    : "px-4 py-2.5 text-sm"
-                                            )}
-                                        >
-                                            {item.name}
-                                            {(item.megaMenu || item.enhancedDropdown) && (
-                                                <ChevronDown className={cn(
-                                                    "w-4 h-4 transition-transform duration-300",
-                                                    activeDropdown === item.name && "rotate-180"
-                                                )} />
-                                            )}
-                                        </Link>
+                                        {item.href ? (
+                                            <Link
+                                                href={item.href}
+                                                className={cn(
+                                                    "flex items-center gap-1 font-semibold text-zinc-700 transition-colors hover:text-brand-teal dark:text-zinc-300 dark:hover:text-brand-teal rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+                                                    isScrolled
+                                                        ? "px-3 py-2 text-[13px]"
+                                                        : "px-4 py-2.5 text-sm"
+                                                )}
+                                            >
+                                                {item.name}
+                                                {(item.megaMenu || item.enhancedDropdown) && (
+                                                    <ChevronDown className={cn(
+                                                        "w-4 h-4 transition-transform duration-300",
+                                                        activeDropdown === item.name && "rotate-180"
+                                                    )} />
+                                                )}
+                                            </Link>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                className={cn(
+                                                    "flex items-center gap-1 font-semibold text-zinc-700 transition-colors hover:text-brand-teal dark:text-zinc-300 dark:hover:text-brand-teal rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+                                                    isScrolled
+                                                        ? "px-3 py-2 text-[13px]"
+                                                        : "px-4 py-2.5 text-sm"
+                                                )}
+                                            >
+                                                {item.name}
+                                                {(item.megaMenu || item.enhancedDropdown) && (
+                                                    <ChevronDown className={cn(
+                                                        "w-4 h-4 transition-transform duration-300",
+                                                        activeDropdown === item.name && "rotate-180"
+                                                    )} />
+                                                )}
+                                            </button>
+                                        )}
                                         </motion.div>
 
                                         <AnimatePresence>
@@ -810,13 +776,19 @@ export function Header() {
                                     </div>
                                     {navItems.map((item) => (
                                         <div key={item.name} className="flex flex-col gap-2">
-                                            <Link
-                                                href={item.href}
-                                                className="text-lg font-semibold text-zinc-700 dark:text-zinc-300 hover:text-brand-teal px-4 py-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                            >
-                                                {item.name}
-                                            </Link>
+                                            {item.href ? (
+                                                <Link
+                                                    href={item.href}
+                                                    className="text-lg font-semibold text-zinc-700 dark:text-zinc-300 hover:text-brand-teal px-4 py-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all"
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            ) : (
+                                                <div className="px-4 py-2 text-lg font-semibold text-zinc-700 dark:text-zinc-300">
+                                                    {item.name}
+                                                </div>
+                                            )}
                                             {item.name === "Standorte" && locations.length > 0 && (
                                                 <div className="ml-4 flex flex-col gap-1">
                                                     {locations.map((location) => (

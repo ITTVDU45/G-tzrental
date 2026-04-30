@@ -122,7 +122,7 @@ export default function InquiryDetailPage() {
             case 'new': return 'bg-blue-500';
             case 'contacted': return 'bg-purple-500';
             case 'offered': return 'bg-yellow-500';
-            case 'confirmed': return 'bg-green-500';
+            case 'confirmed': return 'bg-brand-teal';
             case 'canceled': return 'bg-red-500';
             default: return 'bg-zinc-500';
         }

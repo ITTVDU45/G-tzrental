@@ -85,7 +85,7 @@ export default function AdminBlogPage() {
         {
             header: 'Status',
             accessor: (item: BlogPost) => (
-                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${item.status === 'published' ? 'bg-green-500/10 text-green-500' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'
+                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${item.status === 'published' ? 'bg-brand-teal/10 text-brand-teal' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'
                     }`}>
                     {item.status === 'published' ? 'Veröffentlicht' : 'Entwurf'}
                 </span>

@@ -49,7 +49,7 @@ const industries = [
         description: "Geländegängige Bühnen für den Baumschnitt und Landschaftsbau. Schonend für den Untergrund.",
         icon: Trees,
         image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=800",
-        color: "bg-green-500"
+        color: "bg-brand-teal"
     },
     {
         id: "events",
@@ -154,8 +154,12 @@ export default function IndustriesPage() {
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
 
                                     <div className="absolute bottom-6 left-6 right-6">
-                                        <div className={`w-12 h-12 rounded-xl ${industry.color} flex items-center justify-center mb-4 text-white shadow-lg`}>
-                                            <industry.icon className="w-6 h-6" />
+                                        <div className={`w-12 h-12 rounded-xl ${industry.color || 'bg-brand-teal'} flex items-center justify-center mb-4 text-white shadow-lg`}>
+                                            {industry.icon && typeof industry.icon !== 'string' ? (
+                                                <industry.icon className="w-6 h-6" />
+                                            ) : (
+                                                <Building2 className="w-6 h-6" />
+                                            )}
                                         </div>
                                         <h3 className="text-2xl font-bold text-white mb-2">{industry.title}</h3>
                                     </div>

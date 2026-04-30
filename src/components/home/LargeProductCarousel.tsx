@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
@@ -69,7 +69,33 @@ interface LargeProductCarouselProps {
 }
 
 export function LargeProductCarousel({ title, items }: LargeProductCarouselProps) {
-    const displayItems: HighlightItem[] = items && items.length > 0 ? items : highlightProducts;
+    const [fetchedProducts, setFetchedProducts] = useState<HighlightItem[]>([]);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch('/api/admin/products');
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    const mapped = data.map((p: any) => ({
+                        id: p.id,
+                        title: p.name,
+                        subtitle: p.category || "Mieten",
+                        price: `ab ${p.price || 0} €`,
+                        image: p.image || "https://images.unsplash.com/photo-1581094794329-cd132ad97c55?auto=format&fit=crop&q=80&w=400",
+                        href: `/mieten/geraet/${p.id}`,
+                        isSpecial: false
+                    }));
+                    setFetchedProducts(mapped);
+                }
+            } catch (err) {
+                console.error("Error fetching carousel products:", err);
+            }
+        };
+        fetchProducts();
+    }, []);
+
+    const displayItems: HighlightItem[] = fetchedProducts.length > 0 ? fetchedProducts : (items && items.length > 0 ? items : highlightProducts);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const scroll = (direction: "left" | "right") => {

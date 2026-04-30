@@ -55,10 +55,34 @@ function getInitialBlogFormData(post?: BlogPost | null): Partial<BlogPost> {
 }
 
 export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, pages }: BlogModalProps) {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <BlogModalForm
+                key={post?.id ?? "new-post"}
+                post={post}
+                pages={pages}
+                onCloseAction={onCloseAction}
+                onSaveAction={onSaveAction}
+            />
+        </div>
+    );
+}
+
+function BlogModalForm({
+    post,
+    pages,
+    onCloseAction,
+    onSaveAction,
+}: {
+    post?: BlogPost | null;
+    pages: { id: string; title: string }[];
+    onCloseAction: () => void;
+    onSaveAction: (post: Partial<BlogPost>) => void;
+}) {
     const [formData, setFormData] = useState<Partial<BlogPost>>(() => getInitialBlogFormData(post));
     const [tagInput, setTagInput] = useState("");
-
-    if (!isOpen) return null;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -103,27 +127,26 @@ export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, p
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="p-8 border-b border-zinc-50 dark:border-zinc-800 flex items-center justify-between shrink-0">
-                    <div>
-                        <h2 className="text-2xl font-black text-zinc-900 dark:text-white uppercase tracking-tight">
-                            {post ? "Beitrag bearbeiten" : "Neuer Beitrag"}
-                        </h2>
-                        <p className="text-zinc-500 text-sm font-medium">Teilen Sie Fachwissen und News.</p>
-                    </div>
-                    <button onClick={onCloseAction} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors">
-                        <X className="w-6 h-6 text-zinc-400" />
-                    </button>
+        <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-8 border-b border-zinc-50 dark:border-zinc-800 flex items-center justify-between shrink-0">
+                <div>
+                    <h2 className="text-2xl font-black text-zinc-900 dark:text-white uppercase tracking-tight">
+                        {post ? "Beitrag bearbeiten" : "Neuer Beitrag"}
+                    </h2>
+                    <p className="text-zinc-500 text-sm font-medium">Teilen Sie Fachwissen und News.</p>
                 </div>
+                <button onClick={onCloseAction} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors">
+                    <X className="w-6 h-6 text-zinc-400" />
+                </button>
+            </div>
 
-                <form onSubmit={handleSubmit} className="p-8 space-y-6 overflow-y-auto">
+            <form onSubmit={handleSubmit} className="p-8 space-y-6 overflow-y-auto">
                     <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Titel</label>
                         <input
                             type="text"
                             required
-                            value={formData.title}
+                            value={formData.title ?? ""}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl py-4 px-6 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal/50 transition-all font-bold"
                             placeholder="z.B. Die richtige Arbeitsbühne wählen"
@@ -171,7 +194,7 @@ export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, p
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Status</label>
                             <select
-                                value={formData.status}
+                                value={formData.status ?? "draft"}
                                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                                 className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl py-4 px-6 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal/50 transition-all font-bold"
                             >
@@ -237,7 +260,7 @@ export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, p
                             <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Lesezeit</label>
                             <input
                                 type="text"
-                                value={formData.readTime}
+                                value={formData.readTime ?? ""}
                                 onChange={(e) => setFormData({ ...formData, readTime: e.target.value })}
                                 className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl py-4 px-6 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal/50 transition-all font-bold"
                                 placeholder="z.B. 5 min"
@@ -247,7 +270,7 @@ export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, p
                             <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Datum</label>
                             <input
                                 type="text"
-                                value={formData.date}
+                                value={formData.date ?? ""}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                 className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl py-4 px-6 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal/50 transition-all font-bold"
                             />
@@ -307,7 +330,7 @@ export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, p
                         <textarea
                             rows={3}
                             required
-                            value={formData.excerpt}
+                            value={formData.excerpt ?? ""}
                             onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                             className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-2xl py-4 px-6 text-sm focus:outline-none focus:ring-2 focus:ring-brand-teal/50 transition-all"
                             placeholder="Kurze Zusammenfassung für die Übersicht..."
@@ -337,8 +360,7 @@ export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, p
                             Speichern
                         </button>
                     </div>
-                </form>
-            </div>
+            </form>
         </div>
     );
 }

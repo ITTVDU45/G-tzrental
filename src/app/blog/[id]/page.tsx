@@ -302,8 +302,8 @@ export default function BlogDetailPage() {
                             .blog-content p { margin-bottom: 1.5rem; }
                             .blog-content ul, .blog-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
                             .blog-content li { margin-bottom: 0.5rem; }
-                            .blog-content a { color: #008080; text-decoration: underline; font-weight: 700; }
-                            .blog-content blockquote { border-left: 4px solid #008080; padding-left: 1.5rem; font-style: italic; color: #71717a; }
+                            .blog-content a { color: #005b96; text-decoration: underline; font-weight: 700; }
+                            .blog-content blockquote { border-left: 4px solid #005b96; padding-left: 1.5rem; font-style: italic; color: #71717a; }
                             .blog-content img { width: 100%; height: auto; border-radius: 1.5rem; margin: 2rem 0; object-fit: cover; }
                             .blog-content pre { overflow-x: auto; border-radius: 1.25rem; padding: 1.25rem; background: #18181b; color: white; }
                             .blog-content table { display: block; overflow-x: auto; }

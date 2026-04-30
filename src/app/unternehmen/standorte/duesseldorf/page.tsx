@@ -431,7 +431,7 @@ export default function DuesseldorfPage() {
                                 <div className="p-6">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-xl font-bold text-zinc-900 dark:text-white">{product.name}</h3>
-                                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                        <div className="w-2 h-2 rounded-full bg-brand-teal"></div>
                                     </div>
                                     <div className="text-brand-teal font-bold text-2xl mb-4">
                                         ab {product.price} € /Tag

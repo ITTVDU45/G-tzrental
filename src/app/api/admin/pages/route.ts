@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { COLLECTIONS, deleteByBusinessId, listSeededCollection, seedPages, upsertByBusinessId } from "@/lib/mongo-admin";
+import { COLLECTIONS, deleteByBusinessId, seedPages, upsertByBusinessId } from "@/lib/mongo-admin";
+import { getAdminPageOptions } from "@/lib/frontend-pages";
 
 export async function GET() {
-    const pages = await listSeededCollection(COLLECTIONS.pages, "pages");
+    const pages = await getAdminPageOptions();
     return NextResponse.json(pages);
 }
 

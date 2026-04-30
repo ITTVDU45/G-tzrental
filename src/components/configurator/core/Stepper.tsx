@@ -46,8 +46,8 @@ export default function Stepper({ currentStep, steps }: StepperProps) {
                                     initial={false}
                                     animate={{
                                         scale: isActive ? 1.1 : 1,
-                                        borderColor: isCompleted || isActive ? "#008080" : "#E5E7EB", // brand-teal or zinc-200
-                                        backgroundColor: isCompleted || isActive ? (isCompleted ? "#008080" : "#FFFFFF") : "#FFFFFF",
+                                        borderColor: isCompleted || isActive ? "#005b96" : "#E5E7EB",
+                                        backgroundColor: isCompleted || isActive ? (isCompleted ? "#005b96" : "#FFFFFF") : "#FFFFFF",
                                     }}
                                     className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${isCompleted ? "text-white" : isActive ? "text-brand-teal" : "text-zinc-300 dark:text-zinc-600 dark:bg-zinc-900 dark:border-zinc-800"
                                         }`}

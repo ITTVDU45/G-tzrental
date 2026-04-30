@@ -215,7 +215,7 @@ export default function ProductTemplate({ product, alternatives }: ProductTempla
                                     </div>
                                     <div className="flex flex-col items-center gap-2">
                                         <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider">Verfügbar</span>
-                                        <div className="w-3 h-3 bg-brand-lime rounded-full shadow-[0_0_15px_rgba(157,255,0,0.5)] animate-pulse" />
+                                        <div className="w-3 h-3 bg-brand-lime rounded-full shadow-[0_0_15px_rgba(100,151,177,0.45)] animate-pulse" />
                                     </div>
                                 </div>
 
@@ -617,7 +617,7 @@ function AlternativesList({ alternatives }: { alternatives: I_Any[] }) {
                         )}
                         <div className="absolute top-5 right-5 z-20">
                             <div className="flex items-center gap-2 bg-white/60 dark:bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-white/50 dark:border-white/10">
-                                <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse"></div>
+                                <div className="w-2 h-2 rounded-full bg-brand-teal shadow-[0_0_8px_rgba(0,91,150,0.45)] animate-pulse"></div>
                                 <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-700 dark:text-zinc-200">Verfügbar</span>
                             </div>
                         </div>

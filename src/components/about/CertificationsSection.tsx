@@ -24,8 +24,8 @@ const certifications = [
         iso: "ISO 50001",
         desc: "Nachhaltiger Beitrag zum Umweltschutz. Steigerung der Energieeffizienz und Senkung der CO2-Emissionen.",
         icon: Leaf,
-        color: "text-green-500",
-        bg: "bg-green-50 dark:bg-green-900/20"
+        color: "text-brand-teal",
+        bg: "bg-brand-soft/40 dark:bg-brand-teal/20"
     }
 ];
 

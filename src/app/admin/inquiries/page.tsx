@@ -65,7 +65,7 @@ export default function AdminInquiriesPage() {
             case 'new': return 'bg-blue-500/10 text-blue-500';
             case 'contacted': return 'bg-purple-500/10 text-purple-500';
             case 'offered': return 'bg-yellow-500/10 text-yellow-500';
-            case 'confirmed': return 'bg-green-500/10 text-green-500';
+            case 'confirmed': return 'bg-brand-teal/10 text-brand-teal';
             case 'canceled': return 'bg-red-500/10 text-red-500';
             default: return 'bg-zinc-500/10 text-zinc-500';
         }

@@ -10,7 +10,7 @@ const slides = [
         id: 0,
         title: "Industrielle Lösungen für höchste Präzision",
         description: "Unsere Spezialgeräte für Lager und Industrie – kompakt, wendig und leistungsstark.",
-        image: "/GrünerSpiderListinIndustrielager.png",
+        image: "/uploads/herobild1.png",
         cta: "Spezialgeräte entdecken",
         color: "bg-brand-green",
     },
@@ -18,18 +18,10 @@ const slides = [
         id: 1,
         title: "Effiziente Logistik mit modernster Technik",
         description: "Leistungsstarke Stapler für Ihren Warenumschlag. Zuverlässig und einsatzbereit.",
-        image: "/StablerinIndustriehalle.png",
+        image: "/uploads/Herobild2.png",
         cta: "Stapler ansehen",
         color: "bg-brand-dark",
-    },
-    {
-        id: 2,
-        title: "Ihre Experten für Arbeitsbühnen & Scherenbühnen",
-        description: "Qualität und Sicherheit für Ihre Projekte in luftiger Höhe. Entdecken Sie unsere moderne Flotte.",
-        image: "/Teleskopbühne&Scherenbühne.png",
-        cta: "Jetzt anfragen",
-        color: "bg-brand-teal",
-    },
+    }
 ];
 
 interface HeroCarouselProps {
