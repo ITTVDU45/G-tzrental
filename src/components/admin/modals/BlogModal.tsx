@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, ChevronDown } from "lucide-react";
 import ImagePicker from "../ImagePicker";
 import RichTextEditor from "../RichTextEditor";
@@ -28,8 +28,18 @@ interface BlogModalProps {
     pages: { id: string; title: string }[];
 }
 
-export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, pages }: BlogModalProps) {
-    const [formData, setFormData] = useState<Partial<BlogPost>>({
+function getInitialBlogFormData(post?: BlogPost | null): Partial<BlogPost> {
+    if (post) {
+        return {
+            ...post,
+            pageIds: post.pageIds || [],
+            categories: post.categories || [post.category].filter(Boolean) || ["Ratgeber"],
+            content: post.content || "",
+            tags: post.tags || []
+        };
+    }
+
+    return {
         title: "",
         excerpt: "",
         image: "",
@@ -38,38 +48,15 @@ export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, p
         readTime: "5 min",
         status: "draft",
         pageIds: [],
-        content: "",
         categories: ["Ratgeber"],
+        content: "",
         tags: []
-    });
-    const [tagInput, setTagInput] = useState("");
+    };
+}
 
-    useEffect(() => {
-        if (post) {
-            setFormData({
-                ...post,
-                pageIds: post.pageIds || [],
-                categories: post.categories || [post.category].filter(Boolean) || ["Ratgeber"],
-                content: post.content || "",
-                tags: post.tags || []
-            });
-        } else {
-            setFormData({
-                title: "",
-                excerpt: "",
-                image: "",
-                category: "Ratgeber",
-                date: new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }),
-                readTime: "5 min",
-                status: "draft",
-                pageIds: [],
-                categories: ["Ratgeber"],
-                content: "",
-                tags: []
-            });
-        }
-        setTagInput("");
-    }, [post, isOpen]);
+export default function BlogModal({ isOpen, onCloseAction, onSaveAction, post, pages }: BlogModalProps) {
+    const [formData, setFormData] = useState<Partial<BlogPost>>(() => getInitialBlogFormData(post));
+    const [tagInput, setTagInput] = useState("");
 
     if (!isOpen) return null;
 

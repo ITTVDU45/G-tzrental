@@ -1,7 +1,10 @@
 "use client";
 
 import dynamic from 'next/dynamic';
+import { useRef, useState } from 'react';
 import 'react-quill-new/dist/quill.snow.css';
+import { ImagePlus } from 'lucide-react';
+import { I_Any } from '@/lib/types';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), {
     ssr: false,
@@ -13,28 +16,70 @@ interface EditorProps {
     onChangeAction: (content: string) => void;
 }
 
-const modules = {
-    toolbar: [
-        [{ 'header': [1, 2, 3, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-        ['link', 'clean'],
-    ],
-};
-
 const formats = [
     'header',
     'bold', 'italic', 'underline', 'strike',
     'color', 'background',
     'list',
-    'link'
+    'link',
+    'image'
 ];
 
 export default function RichTextEditor({ value, onChangeAction }: EditorProps) {
+    const editorRef = useRef<I_Any>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const insertImageIntoEditor = async (file: File) => {
+        setIsUploading(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/api/admin/media', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await res.json();
+            if (!res.ok || !data?.url) {
+                throw new Error(data?.error || 'Image upload failed');
+            }
+
+            const editor = editorRef.current?.getEditor?.();
+            if (!editor) return;
+
+            const selection = editor.getSelection(true);
+            const insertAt = typeof selection?.index === 'number' ? selection.index : editor.getLength();
+            editor.insertEmbed(insertAt, 'image', data.url, 'user');
+            editor.setSelection(insertAt + 1);
+        } catch (error) {
+            console.error('Editor image upload failed:', error);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const modules = {
+        toolbar: {
+            container: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['link', 'image', 'clean'],
+            ],
+            handlers: {
+                image: () => fileInputRef.current?.click(),
+            },
+        },
+    };
+
     return (
-        <div className="rich-text-editor transition-all">
+        <div className="rich-text-editor transition-all relative">
             <ReactQuill
+                ref={editorRef}
                 theme="snow"
                 value={value}
                 onChange={onChangeAction}
@@ -42,6 +87,27 @@ export default function RichTextEditor({ value, onChangeAction }: EditorProps) {
                 formats={formats}
                 className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800"
             />
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                        void insertImageIntoEditor(file);
+                    }
+                    e.target.value = '';
+                }}
+            />
+            {isUploading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/75 dark:bg-zinc-900/75 backdrop-blur-sm">
+                    <div className="flex items-center gap-3 rounded-full border border-brand-teal/20 bg-white px-5 py-3 text-xs font-black uppercase tracking-widest text-brand-teal shadow-xl dark:bg-zinc-900">
+                        <ImagePlus className="h-4 w-4" />
+                        Bild wird in MinIO hochgeladen
+                    </div>
+                </div>
+            )}
             <style jsx global>{`
         .rich-text-editor .ql-toolbar {
           border: none !important;
@@ -81,6 +147,12 @@ export default function RichTextEditor({ value, onChangeAction }: EditorProps) {
         }
         .dark .ql-picker {
           color: #a1a1aa !important;
+        }
+        .rich-text-editor .ql-editor img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 1rem;
+          margin: 1rem 0;
         }
       `}</style>
         </div>

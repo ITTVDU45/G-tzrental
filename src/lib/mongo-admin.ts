@@ -177,10 +177,11 @@ export async function getCollection(name: string): Promise<Collection<I_AdminDoc
 }
 
 export async function ensureListCollectionSeeded(name: string, legacyKey: string, fallback: I_Any[] = []) {
-    const collection = await getCollection(name);
-    const count = await collection.countDocuments();
+    const db = await getDb();
+    const collectionExists = await db.listCollections({ name }, { nameOnly: true }).hasNext();
+    const collection = db.collection<I_AdminDoc>(name);
 
-    if (count === 0) {
+    if (!collectionExists) {
         const seed = await getLegacySeed(legacyKey, fallback);
         if (seed.length > 0) {
             await collection.insertMany(seed.map((item) => stripMongoId(item)));

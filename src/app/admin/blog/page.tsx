@@ -144,6 +144,7 @@ export default function AdminBlogPage() {
             />
 
             <BlogModal
+                key={`${selectedPost?.id ?? 'new'}-${isModalOpen ? 'open' : 'closed'}`}
                 isOpen={isModalOpen}
                 onCloseAction={() => setIsModalOpen(false)}
                 onSaveAction={handleSave}
